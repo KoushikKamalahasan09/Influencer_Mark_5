@@ -133,3 +133,67 @@ def search():
         Campaigns = Campaign.query.filter(Campaign.name.ilike(f'%{query}%')).all()
 
     return render_template('search.html', query=query, Campaigns=Campaigns)
+
+@app.route('/sponsor_register', methods=['POST'])
+def register_post():
+    email = request.form.get('email')
+    username = request.form.get('username')
+    password = request.form.get('password')
+    confirm = request.form.get('confirm')
+
+    # all not nullable inputs are not empty
+    if not username or not password or not confirm or not email:
+        flash("Please fill all the mandatory fields")
+        return redirect(url_for('register'))
+
+    # confirm and password should be same
+    if not password == confirm:
+        flash("Confirm and Password are not same")
+        return redirect(url_for('register'))
+
+    # username should be unique
+    user = User.query.filter_by(username=username).first()
+    if user:
+        flash("Please choose another username, selected username is taken")
+        return redirect(url_for('register'))
+
+
+    passhash = generate_password_hash(password)
+
+    user = User(email=email, username=username, passhash=passhash,role=RoleEnum.SPONSOR)
+    db.session.add(user)
+    db.session.commit()
+    flash("Registration Successful, Please login to continue")
+    return redirect(url_for('login'))
+
+@app.route('/influencer_register', methods=['POST'])
+def register_post():
+    email = request.form.get('email')
+    username = request.form.get('username')
+    password = request.form.get('password')
+    confirm = request.form.get('confirm')
+
+    # all not nullable inputs are not empty
+    if not username or not password or not confirm or not email:
+        flash("Please fill all the mandatory fields")
+        return redirect(url_for('register'))
+
+    # confirm and password should be same
+    if not password == confirm:
+        flash("Confirm and Password are not same")
+        return redirect(url_for('register'))
+
+    # username should be unique
+    user = User.query.filter_by(username=username).first()
+    if user:
+        flash("Please choose another username, selected username is taken")
+        return redirect(url_for('register'))
+
+
+    passhash = generate_password_hash(password)
+
+    user = User(email=email, username=username, passhash=passhash,role=RoleEnum.INFLUENCER)
+    db.session.add(user)
+    db.session.commit()
+    flash("Registration Successful, Please login to continue")
+    return redirect(url_for('login'))

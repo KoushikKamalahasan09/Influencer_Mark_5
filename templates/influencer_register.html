@@ -1,1 +1,62 @@
 {% extends 'layout.html' %}
+
+{% block content %}
+    <h1>Register</h1>
+    <form action="" method="POST" class="register-form">
+        <label for="email" class="form-label">Email:</label>
+        <input type="text" name="name" class="form-control">
+
+        <label for="username" class="form-label">Username:</label>
+        <input type="text" name="username" class="form-control">
+
+        <label for="password" class="form-label">Password:</label>
+        <input type="password" name="password" class="form-control">
+
+        <label for="confirm" class="form-label">Confirm Password:</label>
+        <input type="password" name="confirm" class="form-control">
+
+        <button class="btn btn-success">Register</button>
+    </form>
+    <a href="/login" class="login-link">Login</a>
+    <a href="/Sponsor_register" class="register-link">Sponsor Register</a>
+{% endblock %}
+
+{% block style %}
+<style>
+    .register-form {
+        max-width: 400px;
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .form-label {
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    .form-control {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .btn-success {
+        margin-top: 10px;
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .login-link {
+        display: block;
+        margin-top: 10px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
