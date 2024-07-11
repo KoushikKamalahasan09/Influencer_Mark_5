@@ -68,9 +68,9 @@ class Flag(db.Model):
     
 with app.app_context():
     db.create_all()
-    admin = User.query.filter_by(role='admin').first()
+    admin = User.query.filter_by(role=RoleEnum.ADMIN).first()
     if not admin:
-        passhash=generate_password_hash('admin')
-        admin = User(username='admin', passhash=passhash, name='Admin', is_admin=True)
+        passhash = generate_password_hash('admin')
+        admin = User(username='admin', password=passhash, email='admin@example.com', role=RoleEnum.ADMIN)
         db.session.add(admin)
         db.session.commit()
