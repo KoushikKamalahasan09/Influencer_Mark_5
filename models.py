@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
 from datetime import datetime
 from main import app
+
 db = SQLAlchemy(app)
 
 class RoleEnum(Enum):
@@ -17,6 +18,8 @@ class User(db.Model):
     password = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     role = db.Column(db.Enum(RoleEnum), nullable=False)  # Enum for role
+    sponsor = db.relationship('Sponsor', backref='user', uselist=False)
+    influencer = db.relationship('Influencer', backref='user', uselist=False)
 
 # Sponsor model
 class Sponsor(db.Model):
@@ -26,6 +29,7 @@ class Sponsor(db.Model):
     individual_name = db.Column(db.String(100))
     industry = db.Column(db.String(100))
     budget = db.Column(db.Float)
+    campaigns = db.relationship('Campaign', backref='sponsor')
 
 # Influencer model
 class Influencer(db.Model):
@@ -35,6 +39,7 @@ class Influencer(db.Model):
     category = db.Column(db.String(100))
     niche = db.Column(db.String(100))
     reach = db.Column(db.Integer)
+    ad_requests = db.relationship('AdRequest', backref='influencer')
 
 # Campaign model
 class Campaign(db.Model):
@@ -47,6 +52,7 @@ class Campaign(db.Model):
     budget = db.Column(db.Float)
     visibility = db.Column(db.String(50), default='public')  # 'public' or 'private'
     goals = db.Column(db.Text)
+    ad_requests = db.relationship('AdRequest', backref='campaign')
 
 # AdRequest model
 class AdRequest(db.Model):
@@ -65,7 +71,7 @@ class Flag(db.Model):
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=True)
     reason = db.Column(db.Text)
     flagged_at = db.Column(db.DateTime, default=datetime.now())
-    
+
 with app.app_context():
     db.create_all()
     admin = User.query.filter_by(role=RoleEnum.ADMIN).first()
