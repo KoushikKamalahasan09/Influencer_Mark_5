@@ -116,7 +116,7 @@ def logout():
 @admin_required
 def admin():
     users = User.query.all()
-    return render_template('admin.html', users=users)
+    return render_template('admin_home.html', users=users)
 
 @app.route('/users')
 @admin_required
