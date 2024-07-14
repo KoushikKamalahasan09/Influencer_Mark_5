@@ -4,7 +4,7 @@ from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign, AdRequest,
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
-from forms import CampaignForm
+from forms import CampaignForm,ProfileForm
 # routes
 
 # decorator
