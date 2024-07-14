@@ -12,6 +12,7 @@ class ProfileForm(FlaskForm):
     company_name = StringField('Company Name')
     individual_name = StringField('Individual Name')
     industry = StringField('Industry')
+    budget=FloatField('budget')
 
     # Influencer specific fields
     name = StringField('Name')

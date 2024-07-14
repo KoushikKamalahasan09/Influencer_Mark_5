@@ -175,15 +175,20 @@ def profile():
     form = ProfileForm(obj=user)
 
     if user.role ==RoleEnum.SPONSOR:
-        form.company_name.data = user.sponsor.company_name
-        form.individual_name.data = user.sponsor.individual_name
-        form.industry.data = user.sponsor.industry
+        user_id=user.id
+        sponsor = session.query(Sponsor).filter_by(user_id=user_id).first()
+        form.company_name.data = sponsor.company_name
+        form.individual_name.data = sponsor.individual_name
+        form.industry.data = sponsor.industry
+        form.budget.data=sponsor.budget
 
     elif user.role ==RoleEnum.INFLUENCER:
-        form.name.data = user.influencer.name
-        form.category.data = user.influencer.category
-        form.niche.data = user.influencer.niche
-        form.reach.data = user.influencer.reach
+        user_id=user.id
+        influencer = session.query(Influencer).filter_by(user_id=user_id).first()
+        form.name.data =influencer.name
+        form.category.data =influencer.category
+        form.niche.data = influencer.niche
+        form.reach.data = influencer.reach
 
     return render_template('profile.html', form=form)    
 
