@@ -6,18 +6,19 @@ from wtforms.validators import DataRequired, Email, Length
 class ProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[Length(min=6)])
-    
+    password = PasswordField('New Password', validators=[])
+    confirm = PasswordField('Current Password', validators=[DataRequired()])
+
     # Sponsor specific fields
     company_name = StringField('Company Name')
     individual_name = StringField('Individual Name')
     industry = StringField('Industry')
-    budget=FloatField('budget')
+    budget = FloatField('Budget')
 
     # Influencer specific fields
     name = StringField('Name')
     category = StringField('Category')
-    niche = StringField('Niche')
+    platform = StringField('Platform')
     reach = StringField('Reach')
 
     submit = SubmitField('Update')
@@ -26,7 +27,7 @@ class ProfileForm(FlaskForm):
 class CampaignForm(FlaskForm):
     name = StringField('Campaign Name', validators=[DataRequired(), Length(min=2, max=100)])
     description = TextAreaField('Description', validators=[DataRequired()])
-    start_date = DateTimeField('Start Date', validators=[DataRequired()], format='%Y-%m-%d %H:%M:%S')
+    start_date = DateTimeField('Start Date', validators=[], format='%Y-%m-%d %H:%M:%S')
     end_date = DateTimeField('End Date', validators=[DataRequired()], format='%Y-%m-%d %H:%M:%S')
     budget = FloatField('Budget', validators=[DataRequired()])
     visibility = SelectField('Visibility', choices=[('public', 'Public'), ('private', 'Private')], validators=[DataRequired()])

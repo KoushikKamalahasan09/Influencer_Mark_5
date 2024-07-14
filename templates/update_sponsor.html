@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Profile Update</h2>
+    <form action="{{ url_for('update_profile') }}" method="post">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="username">Username</label>
+            {{ form.username(class="form-control", id="username") }}
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            {{ form.email(class="form-control", id="email") }}
+        </div>
+        <div class="form-group">
+            <label for="password">New Password</label>
+            {{ form.password(class="form-control", id="password") }}
+        </div>
+        <div class="form-group">
+            <label for="confirm">Confirm</label>
+            {{ form.password(class="form-control", id="password") }}
+        </div>
+        <div class="form-group">
+            <label for="company_name">Company Name</label>
+            {{ form.company_name(class="form-control", id="company_name") }}
+        </div>
+        <div class="form-group">
+            <label for="individual_name">Individual Name</label>
+            {{ form.individual_name(class="form-control", id="individual_name") }}
+        </div>
+        <div class="form-group">
+            <label for="industry">Industry</label>
+            {{ form.industry(class="form-control", id="industry") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
+{% endblock %}

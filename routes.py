@@ -85,11 +85,6 @@ def admin():
     users = User.query.all()
     return render_template('admin_home.html', users=users)
 
-@app.route('/users')
-@admin_required
-def user_list():
-    users = User.query.all()
-    return render_template('admin/users.html', users=users)
 
 @app.route('/search', methods=['GET', 'POST'])
 @login_required
@@ -108,9 +103,13 @@ def sponsor_register_post():
     username = request.form.get('username')
     password = request.form.get('password')
     confirm = request.form.get('confirm')
+    companyname=request.form.get('company_name')
+    name=request.form.get('name')
+    industry=request.form.get('industry')
+    budget=request.form.get('budget')
 
     # all not nullable inputs are not empty
-    if not username or not password or not confirm or not email:
+    if not username or not password or not confirm or not email or not companyname or not name or not industry or not budget:
         flash("Please fill all the mandatory fields")
         return redirect(url_for('sponsor_register'))
 
@@ -131,6 +130,10 @@ def sponsor_register_post():
     user = User(email=email, username=username, passhash=passhash,role=RoleEnum.SPONSOR)
     db.session.add(user)
     db.session.commit()
+    user = User.query.filter_by(username=username).first()
+    sponsor=Sponsor(user_id=user.id,company_name=companyname,individual_name=name,industry=industry,budget=budget)
+    db.session.add(sponsor)
+    db.session.commit()
     flash("Registration Successful, Please login to continue")
     return redirect(url_for('login'))
 
@@ -140,9 +143,13 @@ def influencer_register_post():
     username = request.form.get('username')
     password = request.form.get('password')
     confirm = request.form.get('confirm')
+    name=request.form.get('name')
+    category=request.form.get('category')
+    platform=request.form.get('platform')
+    reach=request.form.get('reach')
 
     # all not nullable inputs are not empty
-    if not username or not password or not confirm or not email:
+    if not username or not password or not confirm or not email or not name or not category or not platform or not reach:
         flash("Please fill all the mandatory fields")
         return redirect(url_for('influencer_register'))
 
@@ -163,64 +170,71 @@ def influencer_register_post():
     user = User(email=email, username=username, passhash=passhash,role=RoleEnum.INFLUENCER)
     db.session.add(user)
     db.session.commit()
+    user = User.query.filter_by(username=username).first()
+    influencer=Influencer(user_id=user.id,name=name,category=category,platform=platform,reach=reach)
+    db.session.add(influencer)
+    db.session.commit()
     flash("Registration Successful, Please login to continue")
     return redirect(url_for('login'))
 
 
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile')
 @login_required
 def profile():
     username=session['username']
     user = User.query.filter_by(username=username).first()
-    form = ProfileForm(obj=user)
+    if user.role==RoleEnum.SPONSOR:
+        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+        return render_template('profile_sponsor.html',user=user,sponsor=sponsor)    
+    elif user.role==RoleEnum.INFLUENCER:
+        influencer = Influencer.query.filter_by(user_id=user.id).first()    
+        return render_template('profile_influencer.html',user=user,influencer=influencer)    
+    if user.role==RoleEnum.SPONSOR:
+        return render_template('profile_admin.html',user=user)    
 
-    if user.role ==RoleEnum.SPONSOR:
-        user_id=user.id
-        sponsor = Sponsor.query.filter_by(user_id=user_id).first()
-        form.company_name.data = sponsor.company_name
-        form.individual_name.data = sponsor.individual_name
-        form.industry.data = sponsor.industry
-        form.budget.data=sponsor.budget
-
-    elif user.role ==RoleEnum.INFLUENCER:
-        user_id=user.id
-        influencer = Influencer.query.filter_by(user_id=user_id).first()
-        form.name.data =influencer.name
-        form.category.data =influencer.category
-        form.niche.data = influencer.niche
-        form.reach.data = influencer.reach
-
-    return render_template('profile.html', form=form,user=user)    
-
-@app.route('/profile/update', methods=['POST'])
+@app.route('/profile/update', methods=['GET', 'POST'])
 @login_required
 def update_profile():
     form = ProfileForm()
-    username=session['username']
+    username = session['username']
     user = User.query.filter_by(username=username).first()
+
     if form.validate_on_submit():
+        confirm = form.confirm.data
+        password = form.password.data
+
+        if check_password_hash(user.passhash, confirm):
+            if password:
+                user.passhash = generate_password_hash(password)
+        else:
+            flash("Entered current password is incorrect", 'danger')
+            return redirect(url_for('update_profile'))
+
         user.username = form.username.data
         user.email = form.email.data
 
-        if form.password.data:
-            user.passhash = generate_password_hash(form.password.data)
-
-        if user.role ==RoleEnum.SPONSOR:
-            user.sponsor.company_name = form.company_name.data
-            user.sponsor.individual_name = form.individual_name.data
-            user.sponsor.industry = form.industry.data
-
-        elif user.role ==RoleEnum.INFLUENCER:
-            user.influencer.name = form.name.data
-            user.influencer.category = form.category.data
-            user.influencer.niche = form.niche.data
-            user.influencer.reach = form.reach.data
+        if user.role == RoleEnum.SPONSOR:
+            sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+            sponsor.company_name = form.company_name.data
+            sponsor.individual_name = form.individual_name.data
+            sponsor.industry = form.industry.data
+            sponsor.budget = form.budget.data
+        elif user.role == RoleEnum.INFLUENCER:
+            influencer = Influencer.query.filter_by(user_id=user.id).first()
+            influencer.name = form.name.data
+            influencer.category = form.category.data
+            influencer.platform = form.platform.data
+            influencer.reach = form.reach.data
 
         db.session.commit()
         flash('Profile updated successfully.', 'success')
         return redirect(url_for('profile'))
-
-    return render_template('profile.html', form=form)
+    if user.role==RoleEnum.SPONSOR:
+        return render_template('update_sponsor.html', form=form, user=user)
+    elif user.role==RoleEnum.INFLUENCER:
+        return render_template('update_influencer.html', form=form, user=user)
+    else:
+        return render_template('update_admin.html', form=form, user=user)
 
 
 @app.route('/influencer/home')
@@ -246,9 +260,10 @@ def sponsor_home():
         return redirect(url_for('home'))
 
     sponsor = Sponsor.query.filter_by(user_id=user.id).first()
-    campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
+    #campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
 
-    return render_template('sponsor_home.html', campaigns=campaigns,user=user)
+    #return render_template('sponsor_home.html',campaigns=campaigns,user=user)
+    return render_template('sponsor_home.html',user=user)
 
 @app.route('/campaigns')
 @login_required
@@ -266,7 +281,7 @@ def campaigns():
 def add_campaign():
     username=session['username']
     user = User.query.filter_by(username=username).first()
-    if user.role != 'sponsor':
+    if user.role!=RoleEnum.SPONSOR:
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home'))
 
