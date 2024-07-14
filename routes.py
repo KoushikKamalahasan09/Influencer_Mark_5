@@ -190,7 +190,7 @@ def profile():
         form.niche.data = influencer.niche
         form.reach.data = influencer.reach
 
-    return render_template('profile.html', form=form)    
+    return render_template('profile.html', form=form,user=user)    
 
 @app.route('/profile/update', methods=['POST'])
 @login_required
@@ -268,7 +268,7 @@ def add_campaign():
     user = User.query.filter_by(username=username).first()
     if user.role != 'sponsor':
         flash('Unauthorized access.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
     form = CampaignForm()
     if form.validate_on_submit():

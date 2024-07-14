@@ -17,7 +17,7 @@
             <label for="password">Password</label>
             {{ form.password(class="form-control", id="password") }}
         </div>
-        {% if current_user.role == 'sponsor' %}
+        {% if user.role == 'sponsor' %}
             <div class="form-group">
                 <label for="company_name">Company Name</label>
                 {{ form.company_name(class="form-control", id="company_name") }}
@@ -30,7 +30,7 @@
                 <label for="industry">Industry</label>
                 {{ form.industry(class="form-control", id="industry") }}
             </div>
-        {% elif current_user.role == 'influencer' %}
+        {% elif user.role == 'influencer' %}
             <div class="form-group">
                 <label for="name">Name</label>
                 {{ form.name(class="form-control", id="name") }}
