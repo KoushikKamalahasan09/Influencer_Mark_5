@@ -242,12 +242,12 @@ def sponsor_home():
     username = session.get('username')
     if not username:
         flash('No username found in session.', 'danger')
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
 
     user = User.query.filter_by(username=username).first()
     if not user:
         flash('User not found.', 'danger')
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
 
     if user.role != RoleEnum.SPONSOR:
         flash('Unauthorized access.', 'danger')
@@ -261,7 +261,6 @@ def sponsor_home():
     campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
 
     return render_template('sponsor_home.html', campaigns=campaigns, user=user)
-
 
 @app.route('/campaigns')
 @login_required

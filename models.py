@@ -18,8 +18,8 @@ class User(db.Model):
     passhash = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     role = db.Column(db.Enum(RoleEnum), nullable=False)  # Enum for role
-    sponsor = db.relationship('Sponsor', backref='user', uselist=False)
-    influencer = db.relationship('Influencer', backref='user', uselist=False)
+    sponsor = db.relationship('Sponsor', backref='user_profile', uselist=False)
+    influencer = db.relationship('Influencer', backref='user_profile', uselist=False)
 
 # Sponsor model
 class Sponsor(db.Model):
@@ -30,8 +30,6 @@ class Sponsor(db.Model):
     industry = db.Column(db.String(100))
     budget = db.Column(db.Float)
     campaigns = db.relationship('Campaign', backref='sponsor')
-    user = db.relationship('User', backref='sponsor_profile')  # Ensure this relationship exists
-
 
 # Influencer model
 class Influencer(db.Model):
@@ -42,7 +40,6 @@ class Influencer(db.Model):
     niche = db.Column(db.String(100))
     reach = db.Column(db.Integer)
     ad_requests = db.relationship('AdRequest', backref='influencer')
-    campaigns = db.relationship('Campaign', secondary='campaign_influencer', backref='influencers')
 
 # Campaign model
 class Campaign(db.Model):
@@ -55,15 +52,7 @@ class Campaign(db.Model):
     budget = db.Column(db.Float)
     visibility = db.Column(db.String(50), default='public')  # 'public' or 'private'
     goals = db.Column(db.Text)
-    is_active = db.Column(db.Boolean, default=True)
-    progress = db.Column(db.Float, default=0.0)
     ad_requests = db.relationship('AdRequest', backref='campaign')
-
-# Campaign-Influencer association table
-campaign_influencer = db.Table('campaign_influencer',
-    db.Column('campaign_id', db.Integer, db.ForeignKey('campaign.id'), primary_key=True),
-    db.Column('influencer_id', db.Integer, db.ForeignKey('influencer.id'), primary_key=True)
-)
 
 # AdRequest model
 class AdRequest(db.Model):
@@ -88,6 +77,6 @@ with app.app_context():
     admin = User.query.filter_by(role=RoleEnum.ADMIN).first()
     if not admin:
         passhash = generate_password_hash('admin')
-        admin = User(username='admin', passhash=passhash, email='admin@example.com', role=RoleEnum.ADMIN)
+        admin = User(username='admin', password=passhash, email='admin@example.com', role=RoleEnum.ADMIN)
         db.session.add(admin)
         db.session.commit()
