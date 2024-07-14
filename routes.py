@@ -281,3 +281,26 @@ def delete_campaign(campaign_id):
     db.session.commit()
     flash('Campaign deleted successfully', 'success')
     return redirect(url_for('campaigns'))
+
+
+@app.route('/stats')
+@login_required
+def stats():
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    if user.role ==RoleEnum.INFLUENCER:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('index'))
+
+    total_campaigns = Campaign.query.count()
+    active_campaigns = Campaign.query.filter_by(is_active=True).count()
+    influencers_involved = db.session.query(Campaign.influencers).distinct().count()
+    campaigns = Campaign.query.all()
+
+    campaign_progress = [{'title': campaign.name, 'progress': campaign.progress} for campaign in campaigns]
+
+    return render_template('stats.html', 
+                           total_campaigns=total_campaigns,
+                           active_campaigns=active_campaigns,
+                           influencers_involved=influencers_involved,
+                           campaigns=campaign_progress)

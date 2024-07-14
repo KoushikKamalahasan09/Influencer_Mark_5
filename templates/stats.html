@@ -1,1 +1,54 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Campaign Stats</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Campaigns</h5>
+                    <p class="card-text">{{ total_campaigns }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Active Campaigns</h5>
+                    <p class="card-text">{{ active_campaigns }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Influencers Involved</h5>
+                    <p class="card-text">{{ influencers_involved }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h3>Campaign Progress</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Campaign</th>
+                        <th>Progress</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in campaigns %}
+                    <tr>
+                        <td>{{ campaign.title }}</td>
+                        <td>{{ campaign.progress }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
