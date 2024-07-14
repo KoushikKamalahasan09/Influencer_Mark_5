@@ -1,1 +1,9 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Welcome, {{ user.username }}</h2>
+    <p>This is the homepage for Influencers.</p>
+    <!-- Add content specific to influencers -->
+</div>
+{% endblock %}

@@ -31,7 +31,7 @@ def admin_required(func):
         if not user:
             session.pop('username')
             return redirect(url_for('login'))
-        if not user.is_admin:
+        if user.role!=RoleEnum.ADMIN:
             flash("You are not authorized to visit this page")
             return redirect(url_for('home'))
         return func(*args, **kwargs)
@@ -49,40 +49,6 @@ def home():
     else:
         return render_template('influencer_home.html',user=user)
     
-@app.route('/profile')
-@login_required
-def profile():
-    username=session['username']
-    user = User.query.filter_by(username=username).first()
-    return render_template('profile.html', user=user)
-
-@app.route('/profile', methods=['POST'])
-@login_required
-def profile_post():
-    nusername = request.form.get('username')
-    password = request.form.get('password')
-    npassword = request.form.get('npassword')
-    username=session['username']
-    user = User.query.filter_by(username=username).first()
-
-    if password != "" and npassword != "":
-        if check_password_hash(user.passhash, password):
-            user.passhash = generate_password_hash(npassword)
-            flash("Password changed successfully")
-        else:
-            flash("Entered current password is incorrect")
-
-    if nusername != user.username and nusername != "":
-        quser = User.query.filter_by(username=nusername).first()
-        if quser:
-            flash("Username is already taken, please choose any other username")
-            return redirect(url_for('profile'))
-        user.username = nusername
-        session['username']=nusername
-        flash(f"Username changed to {nusername}")
-
-    db.session.commit()
-    return redirect(url_for('profile'))
 
 @app.route('/login')
 def login():
@@ -231,3 +197,25 @@ def profile():
         username=session['username']
         user = User.query.filter_by(username=username).first()
         return render_template('profile.html', user=user)
+    
+
+@app.route('/home/influencer')
+@login_required
+def home_influencer():
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    
+    if user.role!=RoleEnum.INFLUENCER:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('home'))
+    return render_template('influencer_home.html', user=current_user)
+
+@app.route('/home/sponsor')
+@login_required
+def home_sponsor():
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    if user.role!=RoleEnum.SPONSOR:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('home'))
+    return render_template('sponsor_home.html', user=current_user)
