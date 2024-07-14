@@ -90,15 +90,16 @@ def user_list():
     users = User.query.all()
     return render_template('admin/users.html', users=users)
 
-@app.route('/search')
+@app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
-    query = request.args.get('search')
-    Campaigns = None
+    query = request.form.get('search') if request.method == 'POST' else request.args.get('search')
+    campaigns = []
     if query:
-        Campaigns = Campaign.query.filter(Campaign.name.ilike(f'%{query}%')).all()
+        campaigns = Campaign.query.filter(Campaign.title.ilike(f'%{query}%')).all()
 
-    return render_template('search.html', query=query, Campaigns=Campaigns)
+    return render_template('search.html', query=query, campaigns=campaigns)
+
 
 @app.route('/sponsor_register', methods=['POST'])
 def register_post():
