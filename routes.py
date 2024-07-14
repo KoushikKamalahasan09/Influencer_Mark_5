@@ -176,7 +176,7 @@ def profile():
 
     if user.role ==RoleEnum.SPONSOR:
         user_id=user.id
-        sponsor = session.query(Sponsor).filter_by(user_id=user_id).first()
+        sponsor = Sponsor.query.filter_by(user_id=user_id).first()
         form.company_name.data = sponsor.company_name
         form.individual_name.data = sponsor.individual_name
         form.industry.data = sponsor.industry
@@ -184,7 +184,7 @@ def profile():
 
     elif user.role ==RoleEnum.INFLUENCER:
         user_id=user.id
-        influencer = session.query(Influencer).filter_by(user_id=user_id).first()
+        influencer = Influencer.query.filter_by(user_id=user_id).first()
         form.name.data =influencer.name
         form.category.data =influencer.category
         form.niche.data = influencer.niche
