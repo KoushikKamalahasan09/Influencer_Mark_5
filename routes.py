@@ -4,7 +4,7 @@ from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign, AdRequest,
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
-from forms import ProfileForm
+from forms import CampaignForm
 # routes
 
 # decorator
@@ -256,56 +256,75 @@ def campaigns():
     campaigns = Campaign.query.all()
     return render_template('campaigns.html', campaigns=campaigns)
 
-@app.route('/campaigns/add', methods=['GET', 'POST'])
+@app.route('/campaign/add', methods=['GET', 'POST'])
 @login_required
 def add_campaign():
     username=session['username']
     user = User.query.filter_by(username=username).first()
-    if user.role != RoleEnum.SPONSOR:
-        flash('Access denied.', 'danger')
-        return redirect(url_for('home'))
-    if request.method == 'POST':
-        title = request.form['title']
-        description = request.form['description']
-        # Add more fields as needed
-        campaign = Campaign(name=title, description=description)
+    if user.role != 'sponsor':
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('index'))
+
+    form = CampaignForm()
+    if form.validate_on_submit():
+        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+        campaign = Campaign(
+            sponsor_id=sponsor.id,
+            name=form.name.data,
+            description=form.description.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            budget=form.budget.data,
+            visibility=form.visibility.data,
+            goals=form.goals.data
+        )
         db.session.add(campaign)
         db.session.commit()
-        flash('Campaign added successfully', 'success')
-        return redirect(url_for('campaigns'))
-    return render_template('add_campaign.html')
+        flash('Campaign added successfully.', 'success')
+        return redirect(url_for('sponsor_home'))
 
-@app.route('/campaigns/edit/<int:campaign_id>', methods=['GET', 'POST'])
+    return render_template('add_campaign.html', form=form)
+
+@app.route('/campaign/edit/<int:campaign_id>', methods=['GET', 'POST'])
 @login_required
 def edit_campaign(campaign_id):
     username=session['username']
     user = User.query.filter_by(username=username).first()
-    if user.role != RoleEnum.SPONSOR:
-        flash('Access denied.', 'danger')
-        return redirect(url_for('home'))
     campaign = Campaign.query.get_or_404(campaign_id)
-    if request.method == 'POST':
-        campaign.name = request.form['title']
-        campaign.description = request.form['description']
-        # Update more fields as needed
-        db.session.commit()
-        flash('Campaign updated successfully', 'success')
-        return redirect(url_for('campaigns'))
-    return render_template('edit_campaign.html', campaign=campaign)
+    if user.role !=RoleEnum.SPONSOR or campaign.sponsor.user_id != user.id:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('index'))
 
-@app.route('/campaigns/delete/<int:campaign_id>', methods=['POST'])
+    form = CampaignForm(obj=campaign)
+    if form.validate_on_submit():
+        campaign.name = form.name.data
+        campaign.description = form.description.data
+        campaign.start_date = form.start_date.data
+        campaign.end_date = form.end_date.data
+        campaign.budget = form.budget.data
+        campaign.visibility = form.visibility.data
+        campaign.goals = form.goals.data
+        db.session.commit()
+        flash('Campaign updated successfully.', 'success')
+        return redirect(url_for('sponsor_home'))
+
+    return render_template('edit_campaign.html', form=form, campaign=campaign)
+
+
+@app.route('/campaign/delete/<int:campaign_id>', methods=['POST'])
 @login_required
 def delete_campaign(campaign_id):
     username=session['username']
     user = User.query.filter_by(username=username).first()
-    if user.role ==RoleEnum.INFLUENCER:
-        flash('Access denied.', 'danger')
-        return redirect(url_for('index'))
     campaign = Campaign.query.get_or_404(campaign_id)
+    if user.role !=RoleEnum.SPONSOR or campaign.sponsor.user_id != user.id:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('index'))
+
     db.session.delete(campaign)
     db.session.commit()
-    flash('Campaign deleted successfully', 'success')
-    return redirect(url_for('campaigns'))
+    flash('Campaign deleted successfully.', 'success')
+    return redirect(url_for('sponsor_home'))
 
 
 @app.route('/stats')
