@@ -190,7 +190,7 @@ def profile():
         form.niche.data = influencer.niche
         form.reach.data = influencer.reach
 
-    return render_template('profile.html', form=form,user=user)    
+    return render_template('profile.html', form=form)    
 
 @app.route('/profile/update', methods=['POST'])
 @login_required
@@ -239,28 +239,16 @@ def influencer_home():
 @app.route('/sponsor/home')
 @login_required
 def sponsor_home():
-    username = session.get('username')
-    if not username:
-        flash('No username found in session.', 'danger')
-        return redirect(url_for('index'))
-
+    username=session['username']
     user = User.query.filter_by(username=username).first()
-    if not user:
-        flash('User not found.', 'danger')
-        return redirect(url_for('index'))
-
-    if user.role != RoleEnum.SPONSOR:
+    if user.role !=RoleEnum.SPONSOR:
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home'))
 
     sponsor = Sponsor.query.filter_by(user_id=user.id).first()
-    if not sponsor:
-        flash('Sponsor profile not found. Please create your sponsor profile.', 'danger')
-        return redirect(url_for('create_sponsor_profile'))
-
     campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
 
-    return render_template('sponsor_home.html', campaigns=campaigns, user=user)
+    return render_template('sponsor_home.html', campaigns=campaigns,user=user)
 
 @app.route('/campaigns')
 @login_required
