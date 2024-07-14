@@ -2,8 +2,20 @@
 
 {% block content %}
 <div class="container">
-    <h2>Welcome, {{ user.username }}</h2>
-    <p>This is the homepage for Influencers.</p>
-    <!-- Add content specific to influencers -->
+    <h2>Welcome, {{ current_user.username }}!</h2>
+    <h3>Available Campaigns</h3>
+    {% if campaigns %}
+        <ul class="list-group">
+            {% for campaign in campaigns %}
+                <li class="list-group-item">
+                    <h4>{{ campaign.name }}</h4>
+                    <p>{{ campaign.description }}</p>
+                    <a href="{{ url_for('apply_campaign', campaign_id=campaign.id) }}" class="btn btn-primary">Apply</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No campaigns available at the moment.</p>
+    {% endif %}
 </div>
 {% endblock %}

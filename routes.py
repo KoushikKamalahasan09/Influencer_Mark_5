@@ -4,6 +4,7 @@ from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign, AdRequest,
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
+from forms import ProfileForm
 # routes
 
 # decorator
@@ -169,35 +170,53 @@ def register_post():
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    if request.method == 'POST':
-        nusername = request.form.get('username')
-        password = request.form.get('password')
-        npassword = request.form.get('npassword')
-        username=session['username']
-        user = User.query.filter_by(username=username).first()
-        if password != "" and npassword != "":
-            if check_password_hash(user.passhash, password):
-                user.passhash = generate_password_hash(npassword)
-                flash("Password changed successfully")
-            else:
-                flash("Entered current password is incorrect")
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    form = ProfileForm(obj=user)
 
-        if nusername != user.username and nusername != "":
-            quser = User.query.filter_by(username=nusername).first()
-            if quser:
-                flash("Username is already taken, please choose any other username")
-                return redirect(url_for('profile'))
-            user.username = nusername
-            session['username']=nusername
-            flash(f"Username changed to {nusername}")
+    if user.role ==RoleEnum.SPONSOR:
+        form.company_name.data = user.sponsor.company_name
+        form.individual_name.data = user.sponsor.individual_name
+        form.industry.data = user.sponsor.industry
+
+    elif user.role ==RoleEnum.INFLUENCER:
+        form.name.data = user.influencer.name
+        form.category.data = user.influencer.category
+        form.niche.data = user.influencer.niche
+        form.reach.data = user.influencer.reach
+
+    return render_template('profile.html', form=form)    
+
+@app.route('/profile/update', methods=['POST'])
+@login_required
+def update_profile():
+    form = ProfileForm()
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.email = form.email.data
+
+        if form.password.data:
+            user.passhash = generate_password_hash(form.password.data)
+
+        if user.role ==RoleEnum.SPONSOR:
+            user.sponsor.company_name = form.company_name.data
+            user.sponsor.individual_name = form.individual_name.data
+            user.sponsor.industry = form.industry.data
+
+        elif user.role ==RoleEnum.INFLUENCER:
+            user.influencer.name = form.name.data
+            user.influencer.category = form.category.data
+            user.influencer.niche = form.niche.data
+            user.influencer.reach = form.reach.data
 
         db.session.commit()
+        flash('Profile updated successfully.', 'success')
         return redirect(url_for('profile'))
-    else:
-        username=session['username']
-        user = User.query.filter_by(username=username).first()
-        return render_template('profile.html', user=user)
-    
+
+    return render_template('profile.html', form=form)
+
 
 @app.route('/home/influencer')
 @login_required
