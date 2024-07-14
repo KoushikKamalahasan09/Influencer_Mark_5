@@ -4,7 +4,6 @@ from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign, AdRequest,
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
-from flask_login import login_required, current_user
 # routes
 
 # decorator
@@ -219,3 +218,65 @@ def sponsor_home():
         flash('Access denied.', 'danger')
         return redirect(url_for('home'))
     return render_template('sponsor_home.html', user=user)
+
+@app.route('/campaigns')
+@login_required
+def campaigns():
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    if user.role==RoleEnum.INFLUENCER:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('home'))
+    campaigns = Campaign.query.all()
+    return render_template('campaigns.html', campaigns=campaigns)
+
+@app.route('/campaigns/add', methods=['GET', 'POST'])
+@login_required
+def add_campaign():
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    if user.role != RoleEnum.SPONSOR:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        title = request.form['title']
+        description = request.form['description']
+        # Add more fields as needed
+        campaign = Campaign(name=title, description=description)
+        db.session.add(campaign)
+        db.session.commit()
+        flash('Campaign added successfully', 'success')
+        return redirect(url_for('campaigns'))
+    return render_template('add_campaign.html')
+
+@app.route('/campaigns/edit/<int:campaign_id>', methods=['GET', 'POST'])
+@login_required
+def edit_campaign(campaign_id):
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    if user.role != RoleEnum.SPONSOR:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('home'))
+    campaign = Campaign.query.get_or_404(campaign_id)
+    if request.method == 'POST':
+        campaign.name = request.form['title']
+        campaign.description = request.form['description']
+        # Update more fields as needed
+        db.session.commit()
+        flash('Campaign updated successfully', 'success')
+        return redirect(url_for('campaigns'))
+    return render_template('edit_campaign.html', campaign=campaign)
+
+@app.route('/campaigns/delete/<int:campaign_id>', methods=['POST'])
+@login_required
+def delete_campaign(campaign_id):
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    if user.role ==RoleEnum.INFLUENCER:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('index'))
+    campaign = Campaign.query.get_or_404(campaign_id)
+    db.session.delete(campaign)
+    db.session.commit()
+    flash('Campaign deleted successfully', 'success')
+    return redirect(url_for('campaigns'))

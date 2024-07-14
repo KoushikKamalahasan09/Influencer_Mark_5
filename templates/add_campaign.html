@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Add Campaign</h2>
+    <form method="POST" action="{{ url_for('add_campaign') }}">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" required></textarea>
+        </div>
+        <!-- Add more fields as needed -->
+        <button type="submit" class="btn btn-primary">Add Campaign</button>
+    </form>
+</div>
+{% endblock %}
