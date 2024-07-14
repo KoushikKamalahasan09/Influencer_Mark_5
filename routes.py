@@ -37,17 +37,17 @@ def admin_required(func):
         return func(*args, **kwargs)
     return wrapper
 
-@app.route('/')
+@app.route('/home')
 @login_required
 def home():
     username=session['username']
     user = User.query.filter_by(username=username).first()
-    if user.role==RoleEnum.ADMIN:
-        return redirect(url_for('admin'))
-    elif user.role==RoleEnum.SPONSOR:
+    if user.role ==RoleEnum.SPONSOR:
         return redirect(url_for('sponsor_home'))
-    else:
+    elif user.role ==RoleEnum.INFLUENCER:
         return redirect(url_for('influencer_home'))
+    else:
+        return redirect(url_for('admin'))
     
 
 @app.route('/login')
@@ -218,26 +218,32 @@ def update_profile():
     return render_template('profile.html', form=form)
 
 
-@app.route('/home/influencer')
+@app.route('/influencer/home')
 @login_required
 def influencer_home():
     username=session['username']
     user = User.query.filter_by(username=username).first()
-    
-    if user.role!=RoleEnum.INFLUENCER:
-        flash('Access denied.', 'danger')
-        return redirect(url_for('home'))
-    return render_template('influencer_home.html', user=user)
+    if user.role !=RoleEnum.INFLUENCER:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('index'))
 
-@app.route('/home/sponsor')
+    campaigns = Campaign.query.filter_by(visibility='public').all()
+
+    return render_template('influencer_home.html', campaigns=campaigns)
+
+@app.route('/sponsor/home')
 @login_required
 def sponsor_home():
     username=session['username']
     user = User.query.filter_by(username=username).first()
-    if user.role!=RoleEnum.SPONSOR:
-        flash('Access denied.', 'danger')
-        return redirect(url_for('home'))
-    return render_template('sponsor_home.html', user=user)
+    if user.role !=RoleEnum.SPONSOR:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('index'))
+
+    sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+    campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
+
+    return render_template('sponsor_home.html', campaigns=campaigns)
 
 @app.route('/campaigns')
 @login_required
