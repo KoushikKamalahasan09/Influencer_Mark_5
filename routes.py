@@ -45,9 +45,9 @@ def home():
     if user.role==RoleEnum.ADMIN:
         return redirect(url_for('admin'))
     elif user.role==RoleEnum.SPONSOR:
-        return render_template('sponsor_home.html',user=user)
+        return redirect(url_for('sponsor_home'))
     else:
-        return render_template('influencer_home.html',user=user)
+        return redirect(url_for('influencer_home'))
     
 
 @app.route('/login')
@@ -201,21 +201,21 @@ def profile():
 
 @app.route('/home/influencer')
 @login_required
-def home_influencer():
+def influencer_home():
     username=session['username']
     user = User.query.filter_by(username=username).first()
     
     if user.role!=RoleEnum.INFLUENCER:
         flash('Access denied.', 'danger')
         return redirect(url_for('home'))
-    return render_template('influencer_home.html', user=current_user)
+    return render_template('influencer_home.html', user=user)
 
 @app.route('/home/sponsor')
 @login_required
-def home_sponsor():
+def sponsor_home():
     username=session['username']
     user = User.query.filter_by(username=username).first()
     if user.role!=RoleEnum.SPONSOR:
         flash('Access denied.', 'danger')
         return redirect(url_for('home'))
-    return render_template('sponsor_home.html', user=current_user)
+    return render_template('sponsor_home.html', user=user)
