@@ -229,7 +229,7 @@ def influencer_home():
 
     campaigns = Campaign.query.filter_by(visibility='public').all()
 
-    return render_template('influencer_home.html', campaigns=campaigns)
+    return render_template('influencer_home.html', campaigns=campaigns,user=user)
 
 @app.route('/sponsor/home')
 @login_required
@@ -243,7 +243,7 @@ def sponsor_home():
     sponsor = Sponsor.query.filter_by(user_id=user.id).first()
     campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
 
-    return render_template('sponsor_home.html', campaigns=campaigns)
+    return render_template('sponsor_home.html', campaigns=campaigns,user=user)
 
 @app.route('/campaigns')
 @login_required
