@@ -30,6 +30,8 @@ class Sponsor(db.Model):
     industry = db.Column(db.String(100))
     budget = db.Column(db.Float)
     campaigns = db.relationship('Campaign', backref='sponsor')
+    user = db.relationship('User', backref='sponsor_profile')  # Ensure this relationship exists
+
 
 # Influencer model
 class Influencer(db.Model):
