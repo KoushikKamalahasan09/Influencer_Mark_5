@@ -37,7 +37,7 @@ def admin_required(func):
         return func(*args, **kwargs)
     return wrapper
 
-@app.route('/home')
+@app.route('/')
 @login_required
 def home():
     username=session['username']
@@ -103,7 +103,7 @@ def search():
 
 
 @app.route('/sponsor_register', methods=['POST'])
-def register_post():
+def sponsor_register_post():
     email = request.form.get('email')
     username = request.form.get('username')
     password = request.form.get('password')
@@ -112,18 +112,18 @@ def register_post():
     # all not nullable inputs are not empty
     if not username or not password or not confirm or not email:
         flash("Please fill all the mandatory fields")
-        return redirect(url_for('register'))
+        return redirect(url_for('sponsor_register'))
 
     # confirm and password should be same
     if not password == confirm:
         flash("Confirm and Password are not same")
-        return redirect(url_for('register'))
+        return redirect(url_for('sponsor_register'))
 
     # username should be unique
     user = User.query.filter_by(username=username).first()
     if user:
         flash("Please choose another username, selected username is taken")
-        return redirect(url_for('register'))
+        return redirect(url_for('sponsor_register'))
 
 
     passhash = generate_password_hash(password)
@@ -135,7 +135,7 @@ def register_post():
     return redirect(url_for('login'))
 
 @app.route('/influencer_register', methods=['POST'])
-def register_post():
+def influencer_register_post():
     email = request.form.get('email')
     username = request.form.get('username')
     password = request.form.get('password')
@@ -144,18 +144,18 @@ def register_post():
     # all not nullable inputs are not empty
     if not username or not password or not confirm or not email:
         flash("Please fill all the mandatory fields")
-        return redirect(url_for('register'))
+        return redirect(url_for('influencer_register'))
 
     # confirm and password should be same
     if not password == confirm:
         flash("Confirm and Password are not same")
-        return redirect(url_for('register'))
+        return redirect(url_for('influencer_register'))
 
     # username should be unique
     user = User.query.filter_by(username=username).first()
     if user:
         flash("Please choose another username, selected username is taken")
-        return redirect(url_for('register'))
+        return redirect(url_for('influencer_register'))
 
 
     passhash = generate_password_hash(password)
