@@ -243,7 +243,7 @@ def sponsor_home():
     user = User.query.filter_by(username=username).first()
     if user.role !=RoleEnum.SPONSOR:
         flash('Unauthorized access.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
     sponsor = Sponsor.query.filter_by(user_id=user.id).first()
     campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
