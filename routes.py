@@ -189,54 +189,144 @@ def profile():
     elif user.role==RoleEnum.INFLUENCER:
         influencer = Influencer.query.filter_by(user_id=user.id).first()    
         return render_template('profile_influencer.html',user=user,influencer=influencer)    
-    if user.role==RoleEnum.SPONSOR:
+    else:
         return render_template('profile_admin.html',user=user)    
 
 @app.route('/profile/update', methods=['GET', 'POST'])
 @login_required
 def update_profile():
-    form = ProfileForm()
     username = session['username']
     user = User.query.filter_by(username=username).first()
-
-    if form.validate_on_submit():
-        confirm = form.confirm.data
-        password = form.password.data
-
-        if check_password_hash(user.passhash, confirm):
-            if password:
-                user.passhash = generate_password_hash(password)
-        else:
-            flash("Entered current password is incorrect", 'danger')
-            return redirect(url_for('update_profile'))
-
-        user.username = form.username.data
-        user.email = form.email.data
-
-        if user.role == RoleEnum.SPONSOR:
-            sponsor = Sponsor.query.filter_by(user_id=user.id).first()
-            sponsor.company_name = form.company_name.data
-            sponsor.individual_name = form.individual_name.data
-            sponsor.industry = form.industry.data
-            sponsor.budget = form.budget.data
-        elif user.role == RoleEnum.INFLUENCER:
-            influencer = Influencer.query.filter_by(user_id=user.id).first()
-            influencer.name = form.name.data
-            influencer.category = form.category.data
-            influencer.platform = form.platform.data
-            influencer.reach = form.reach.data
-
-        db.session.commit()
-        flash('Profile updated successfully.', 'success')
-        return redirect(url_for('profile'))
+    
     if user.role==RoleEnum.SPONSOR:
-        return render_template('update_sponsor.html', form=form, user=user)
+        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+        return render_template('update_spoonsor.html',user=user,sponsor=sponsor)
     elif user.role==RoleEnum.INFLUENCER:
-        return render_template('update_influencer.html', form=form, user=user)
+        influencer = Influencer.query.filter_by(user_id=user.id).first()    
+        return render_template('update_influencer.html',user=user,influencer=influencer)  
     else:
-        return render_template('update_admin.html', form=form, user=user)
+        return render_template('update_admin.html',user=user) 
+        
 
+@app.route('/profile/update',methods=['POST'])
+@login_required
+def update_post():
+    username = session['username']
+    user = User.query.filter_by(username=username).first()
+    if user.role==RoleEnum.SPONSOR:
+        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+        nusername = request.form.get('username')
+        password = request.form.get('password')
+        npassword = request.form.get('npassword')
+        email=request.form.get('email')
+        company_name = request.form.get('company_name')
+        individual_name = request.form.get('individual_name')
+        budget = request.form.get('budget')
+        industry=request.form.get('industry')
+        
+        if password != "" and npassword != "":
+            if check_password_hash(user.passhash, password):
+                user.passhash = generate_password_hash(npassword)
+                flash("Password changed successfully")
+            else:
+                flash("Entered current password is incorrect")
 
+        if nusername != user.username and nusername != "":
+            quser = User.query.filter_by(username=nusername).first()
+            if quser:
+                flash("Username is already taken, please choose any other username")
+                return redirect(url_for('update_profile'))
+        if email != user.email and email != "":
+            quser = User.query.filter_by(email=email).first()
+            if quser:
+                flash("Email is already in use.")
+                return redirect(url_for('update_profile'))
+        
+        
+        user.username = nusername
+        user.email = email
+        sponsor.comapny_name = company_name
+        sponsor.individual_name = individual_name
+        sponsor.budget = budget
+        sponsor.industry = industry
+            
+        session['username']=nusername
+        flash(f"The entered changes have been noted and changed in our side.",category='success')
+    
+    elif user.role==RoleEnum.INFLUENCER:
+        influencer = Influencer.query.filter_by(user_id=user.id).first()
+        nusername = request.form.get('username')
+        password = request.form.get('password')
+        npassword = request.form.get('npassword')
+        email=request.form.get('email')
+        name = request.form.get('name')
+        category = request.form.get('category')
+        platform = request.form.get('platform')
+        reach=request.form.get('reach')
+        
+        if password != "" and npassword != "":
+            if check_password_hash(user.passhash, password):
+                user.passhash = generate_password_hash(npassword)
+                flash("Password changed successfully")
+            else:
+                flash("Entered current password is incorrect")
+
+        if nusername != user.username and nusername != "":
+            quser = User.query.filter_by(username=nusername).first()
+            if quser:
+                flash("Username is already taken, please choose any other username")
+                return redirect(url_for('update_profile'))
+        if email != user.email and email != "":
+            quser = User.query.filter_by(email=email).first()
+            if quser:
+                flash("Email is already in use.")
+                return redirect(url_for('update_profile'))
+        
+        
+        user.username = nusername
+        user.email = email
+        influencer.name = name
+        influencer.category = category
+        influencer.platform = platform
+        influencer.reach = reach
+            
+        session['username']=nusername
+        flash(f"The entered changes have been noted and changed in our side.",category='success')
+        
+    else:
+        nusername = request.form.get('username')
+        password = request.form.get('password')
+        npassword = request.form.get('npassword')
+        email=request.form.get('email')
+        
+        if password != "" and npassword != "":
+            if check_password_hash(user.passhash, password):
+                user.passhash = generate_password_hash(npassword)
+                flash("Password changed successfully")
+            else:
+                flash("Entered current password is incorrect")
+
+        if nusername != user.username and nusername != "":
+            quser = User.query.filter_by(username=nusername).first()
+            if quser:
+                flash("Username is already taken, please choose any other username")
+                return redirect(url_for('update_profile'))
+        if email != user.email and email != "":
+            quser = User.query.filter_by(email=email).first()
+            if quser:
+                flash("Email is already in use.")
+                return redirect(url_for('update_profile'))
+        
+        
+        user.username = nusername
+        user.email = email
+        session['username']=nusername
+        flash(f"The entered changes have been noted and changed in our side.",category='success')
+        
+    db.session.commit()
+    return redirect(url_for('profile'))
+    
+    
 @app.route('/influencer/home')
 @login_required
 def influencer_home():
