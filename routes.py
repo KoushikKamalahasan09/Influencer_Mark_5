@@ -366,7 +366,12 @@ def campaigns():
     campaigns = Campaign.query.all()
     return render_template('campaigns.html', campaigns=campaigns)
 
-@app.route('/campaign/add', methods=['GET', 'POST'])
+@app.route('/campaign/add')
+@admin_required
+def campaign_add():
+    return render_template('add_campaign.html')
+
+@app.route('/campaign/add')
 @login_required
 def add_campaign():
     username=session['username']
@@ -375,51 +380,88 @@ def add_campaign():
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home'))
 
-    form = CampaignForm()
-    if form.validate_on_submit():
-        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
-        campaign = Campaign(
-            sponsor_id=sponsor.id,
-            name=form.name.data,
-            description=form.description.data,
-            start_date=form.start_date.data,
-            end_date=form.end_date.data,
-            budget=form.budget.data,
-            visibility=form.visibility.data,
-            goals=form.goals.data
-        )
-        db.session.add(campaign)
-        db.session.commit()
-        flash('Campaign added successfully.', 'success')
-        return redirect(url_for('sponsor_home'))
+    name = request.form.get('name')
+    description = request.form.get('description')
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
+    budget = request.form.get('budget')
+    goals = request.form.get('goals')
+    visibility=request.form.get('visibility')
+    
+    if not name:
+        flash("Name is mandatory")
+        return redirect(url_for('campaign_add'))
+    
+    campaign = Campaign.query.filter_by(name=name).first()
+    if campaign:
+        flash("Campaign with this name already exists")
+        return redirect(url_for('campaign_add'))
 
-    return render_template('add_campaign.html', form=form)
+    if len(name) > 15:
+        flash("Campaign Name cannot be more than 15 characters")
+        return redirect(url_for('campaign_add'))
 
-@app.route('/campaign/edit/<int:campaign_id>', methods=['GET', 'POST'])
-@login_required
-def edit_campaign(campaign_id):
-    username=session['username']
-    user = User.query.filter_by(username=username).first()
-    campaign = Campaign.query.get_or_404(campaign_id)
-    if user.role !=RoleEnum.SPONSOR or campaign.sponsor.user_id != user.id:
-        flash('Unauthorized access.', 'danger')
-        return redirect(url_for('index'))
+    if len(description) > 250:
+        flash("Campaign Description cannot be more than 250 characters")
+        return redirect(url_for('campaign_add'))
+    
+    if len(goals) > 40:
+        flash("Campaign goals cannot be more than 40 characters")
+        return redirect(url_for('campaign_add'))
+    
+    campaign = Campaign(name=name, description=description,start_date=start_date,end_date=end_date,budget=budget,goals=goals,visibility=visibility)
+    db.session.add(campaign)
+    db.session.commit()
+    flash("Category added Successfully",category='success')
+    return redirect(url_for('campaigns'))
 
-    form = CampaignForm(obj=campaign)
-    if form.validate_on_submit():
-        campaign.name = form.name.data
-        campaign.description = form.description.data
-        campaign.start_date = form.start_date.data
-        campaign.end_date = form.end_date.data
-        campaign.budget = form.budget.data
-        campaign.visibility = form.visibility.data
-        campaign.goals = form.goals.data
-        db.session.commit()
-        flash('Campaign updated successfully.', 'success')
-        return redirect(url_for('sponsor_home'))
+@app.route('/category/<int:id>/edit')
+@admin_required
+def campaign_edit(id):
+    campaign = campaign.query.get(id)
+    return render_template('edit_campaign.html', campaign=campaign)
 
-    return render_template('edit_campaign.html', form=form, campaign=campaign)
 
+@app.route('/category/<int:id>/edit', methods=['POST'])
+@admin_required
+def category_edit_post(id):
+    name = request.form.get('name')
+    description = request.form.get('description')
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
+    budget = request.form.get('budget')
+    goals = request.form.get('goals')
+    visibility=request.form.get('visibility')
+
+    if not name:
+        flash("Name is mandatory")
+        return redirect(url_for('campaigns'))
+
+    current_campaign = Campaign.query.get(id)
+    campaign = Campaign.query.filter_by(name=name).first()
+
+    if campaign and campaign.id != current_campaign.id:
+        flash("Campaign with this name already exists")
+        return redirect(url_for('campaigns'))
+
+    if len(name) > 15:
+        flash("Category Name cannot be more than 15 characters")
+        return redirect(url_for('campaign_edit'))
+
+    if len(description) > 250:
+        flash("Category Description cannot be more than 250 characters")
+        return redirect(url_for('camapign_edit'))
+    
+    current_campaign.name = name
+    current_campaign.description = description
+    current_campaign.start_date = start_date
+    current_campaign.end_date = end_date
+    current_campaign.budget = budget
+    current_campaign.goals = goals
+    current_campaign.visibility = visibility
+    db.session.commit()
+    flash("Campaign edited Successfully")
+    return redirect(url_for('campaigns'))
 
 @app.route('/campaign/delete/<int:campaign_id>', methods=['POST'])
 @login_required
@@ -434,7 +476,7 @@ def delete_campaign(campaign_id):
     db.session.delete(campaign)
     db.session.commit()
     flash('Campaign deleted successfully.', 'success')
-    return redirect(url_for('sponsor_home'))
+    return redirect(url_for('campaigns'))
 
 
 @app.route('/stats')
