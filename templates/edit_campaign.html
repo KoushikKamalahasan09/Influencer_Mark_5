@@ -1,40 +1,36 @@
-
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
 {% block content %}
-<div class="container">
-    <h2>Edit Campaign</h2>
-    <form action="{{ url_for('edit_campaign', campaign_id=campaign.id) }}" method="post">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            <label for="name">Campaign Name</label>
-            {{ form.name(class="form-control", id="name") }}
-        </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            {{ form.description(class="form-control", id="description") }}
-        </div>
-        <div class="form-group">
-            <label for="start_date">Start Date</label>
-            {{ form.start_date(class="form-control", id="start_date") }}
-        </div>
-        <div class="form-group">
-            <label for="end_date">End Date</label>
-            {{ form.end_date(class="form-control", id="end_date") }}
-        </div>
-        <div class="form-group">
-            <label for="budget">Budget</label>
-            {{ form.budget(class="form-control", id="budget") }}
-        </div>
-        <div class="form-group">
-            <label for="visibility">Visibility</label>
-            {{ form.visibility(class="form-control", id="visibility") }}
-        </div>
-        <div class="form-group">
-            <label for="goals">Goals</label>
-            {{ form.goals(class="form-control", id="goals") }}
-        </div>
-        <button type="submit" class="btn btn-primary">Update Campaign</button>
+    <h1>Edit Campaign</h1>
+    <hr>
+    <form action="" method="post" class="edit-campaign-form">
+        <label class="form-label" for="name">Campaign Name:</label>
+        <input class="form-control" type="text" name="name" id="name" maxlength="15" value="{{ campaign.name }}>
+
+        <label class="form-label" for="description">Description:</label>
+        <textarea name="description" id="description" cols="30" rows="10" maxlength="250" class="form-control">{{ campaign.description }}</textarea>
+
+        <label class="form-label" for="start_date">Start Date:</label>
+        <input class="form-control" type="date" name="start_date" id="start_date" value ={{campaign.start_date}}>
+
+        <label class="form-label" for="end_date">End Date:</label>
+        <input class="form-control" type="date" name="end_date" id="end_date"value={{campaign.end_date}}>
+
+        <label class="form-label" for="budget">Budget:</label>
+        <input class="form-control" type="number" name="budget" id="budget"value={{campaign.budget}}>
+
+        <label class="form-label" for="visibility">Visibility:</label>
+        <select id="choice" name="visibility">
+            <option value="public" selected>Public</option>
+            <option value="private">private</option>
+        </select>
+        
+        <label class="form-label" for="goals">Goals:</label>
+        <input class="form-control" type="text" name="goals" id="goals" maxlength="50"value={{campaign.goals}}>
+        
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            Create
+        </button>
     </form>
-</div>
 {% endblock %}
