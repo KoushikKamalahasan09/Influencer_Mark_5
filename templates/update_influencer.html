@@ -1,44 +1,37 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
 {% block content %}
-<div class="container">
-    <h2>Profile Update</h2>
-    <form action="{{ url_for('update_profile') }}" method="post">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            <label for="username">Username</label>
-            {{ form.username(class="form-control", id="username") }}
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            {{ form.email(class="form-control", id="email") }}
-        </div>
-        <div class="form-group">
-            <label for="password">New Password</label>
-            {{ form.password(class="form-control", id="password") }}
-        </div>
-        <div class="form-group">
-            <label for="confirm">Confirm</label>
-            {{ form.password(class="form-control", id="password") }}
-        </div>
-        
-        <div class="form-group">
-            <label for="name">Name</label>
-            {{ form.name(class="form-control", id="name") }}
-        </div>
-        <div class="form-group">
-            <label for="category">Category</label>
-            {{ form.category(class="form-control", id="category") }}
-        </div>
-        <div class="form-group">
-            <label for="niche">Niche</label>
-            {{ form.niche(class="form-control", id="niche") }}
-        </div>
-        <div class="form-group">
-            <label for="reach">Reach</label>
-            {{ form.reach(class="form-control", id="reach") }}
-        </div>
-        <button type="submit" class="btn btn-primary">Update</button>
-    </form>
-</div>
+
+<form action="" method="post" class="profile-form">
+
+
+    <label class="form-label" for="username">Username:</label>
+    <input class="form-control" type="text" name="username" id="username" value="{{ user.username }}">
+
+    <label class="form-label" for="email">Email:</label>
+    <input class="form-control" type="text" name="email" id="email" value="{{ user.email }}">
+
+    <label class="form-label" for="individual_name">Name of Individual:</label>
+    <input class="form-control" type="text" name="individual_name" id="individual_name" value="{{ influencer.name }}">
+
+    <label class="form-label" for="category">Category:</label>
+    <input class="form-control" type="text" name="category" id="category" value="{{ influencer.category }}">
+
+    <label class="form-label" for="platform">Platform:</label>
+    <input class="form-control" type="text" name="platform" id="platform" value="{{ influencer.platform }}">
+
+    <label class="form-label" for="reach">Number of Followers:</label>
+    <input class="form-control" type="number" name="reach" id="reach" value="{{ influencer.reach }}">
+
+    <label class="form-label" for="password">Current Password:</label>
+    <input class="form-control" type="password" name="password" id="password">
+
+    <label class="form-label" for="npassword">New Password:</label>
+    <input class="form-control" type="password" name="npassword" id="npassword">
+
+
+
+    <button class="btn btn-primary" type="submit">Change</button>
+</form>
+
 {% endblock %}
