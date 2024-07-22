@@ -4,7 +4,6 @@ from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign, AdRequest,
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
-from forms import CampaignForm,ProfileForm
 # routes
 
 # decorator
@@ -192,7 +191,7 @@ def profile():
     else:
         return render_template('profile_admin.html',user=user)    
 
-@app.route('/profile/update', methods=['GET', 'POST'])
+@app.route('/profile/update')
 @login_required
 def update_profile():
     username = session['username']
@@ -200,13 +199,16 @@ def update_profile():
     
     if user.role==RoleEnum.SPONSOR:
         sponsor = Sponsor.query.filter_by(user_id=user.id).first()
-        return render_template('update_spoonsor.html',user=user,sponsor=sponsor)
+        return render_template('update_sponsor.html',user=user,sponsor=sponsor)
     elif user.role==RoleEnum.INFLUENCER:
         influencer = Influencer.query.filter_by(user_id=user.id).first()    
         return render_template('update_influencer.html',user=user,influencer=influencer)  
     else:
         return render_template('update_admin.html',user=user) 
         
+
+
+
 
 @app.route('/profile/update',methods=['POST'])
 @login_required
@@ -350,10 +352,9 @@ def sponsor_home():
         return redirect(url_for('home'))
 
     sponsor = Sponsor.query.filter_by(user_id=user.id).first()
-    #campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
+    campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
 
-    #return render_template('sponsor_home.html',campaigns=campaigns,user=user)
-    return render_template('sponsor_home.html',user=user)
+    return render_template('sponsor_home.html',campaigns=campaigns,user=user)
 
 @app.route('/campaigns')
 @login_required
@@ -363,30 +364,33 @@ def campaigns():
     if user.role==RoleEnum.INFLUENCER:
         flash('Access denied.', 'danger')
         return redirect(url_for('home'))
-    campaigns = Campaign.query.all()
-    return render_template('campaigns.html', campaigns=campaigns)
-
-@app.route('/campaign/add')
-@admin_required
-def campaign_add():
-    return render_template('add_campaign.html')
+    campaign = Campaign.query.all()
+    return render_template('campaigns.html', campaign=campaign)
 
 @app.route('/campaign/add')
 @login_required
+def campaign_add():
+    return render_template('add_campaign.html')
+
+
+@app.route('/campaign/add', methods=['POST'])
+@login_required
 def add_campaign():
-    username=session['username']
+    username = session['username']
     user = User.query.filter_by(username=username).first()
-    if user.role!=RoleEnum.SPONSOR:
+    if user.role != RoleEnum.SPONSOR:
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home'))
 
+    sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+    sponsor_id=sponsor.id
     name = request.form.get('name')
     description = request.form.get('description')
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
     budget = request.form.get('budget')
     goals = request.form.get('goals')
-    visibility=request.form.get('visibility')
+    visibility = request.form.get('visibility')
     
     if not name:
         flash("Name is mandatory")
@@ -405,18 +409,27 @@ def add_campaign():
         flash("Campaign Description cannot be more than 250 characters")
         return redirect(url_for('campaign_add'))
     
-    if len(goals) > 40:
-        flash("Campaign goals cannot be more than 40 characters")
+    if len(goals) > 50:
+        flash("Campaign goals cannot be more than 50 characters")
         return redirect(url_for('campaign_add'))
     
-    campaign = Campaign(name=name, description=description,start_date=start_date,end_date=end_date,budget=budget,goals=goals,visibility=visibility)
+    # Parse the start_date and end_date
+    try:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+    except ValueError:
+        flash("Invalid date format")
+        return redirect(url_for('campaign_add'))
+    
+    campaign = Campaign(sponsor_id=sponsor_id,name=name, description=description, start_date=start_date, end_date=end_date, budget=budget, goals=goals, visibility=visibility)
     db.session.add(campaign)
     db.session.commit()
-    flash("Category added Successfully",category='success')
+    flash("Campaign added Successfully", category='success')
     return redirect(url_for('campaigns'))
 
+
 @app.route('/category/<int:id>/edit')
-@admin_required
+@login_required
 def campaign_edit(id):
     campaign = campaign.query.get(id)
     return render_template('edit_campaign.html', campaign=campaign)
