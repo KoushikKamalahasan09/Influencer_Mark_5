@@ -614,3 +614,33 @@ def views_campaign(campaign_id):
     
     return render_template('view_campaign.html', campaign=campaign)
 
+@app.route('/update_progress/<int:campaign_id>', methods=['POST'])
+@login_required
+def update_progress(campaign_id):
+    username = session['username']
+    user = User.query.filter_by(username=username).first_or_404()
+    
+    # Check if user is an influencer
+    if user.role != RoleEnum.INFLUENCER:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('index'))
+    
+    # Get the campaign and check if the user has applied
+    campaign = Campaign.query.get_or_404(campaign_id)
+    application = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign_id).first()
+    
+    if not application:
+        flash('You have not applied for this campaign.', 'danger')
+        return redirect(url_for('influencer_home'))
+    
+    # Get the new progress value from the form
+    new_progress = request.form.get('progress', type=float)
+    
+    if new_progress is not None and 0 <= new_progress <= 100:
+        campaign.progress = new_progress
+        db.session.commit()
+        flash('Progress updated successfully!', 'success')
+    else:
+        flash('Invalid progress value.', 'danger')
+    
+    return redirect(url_for('view_campaign', campaign_id=campaign_id))

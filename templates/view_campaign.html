@@ -45,18 +45,20 @@
             </script>
             {% endblock %}
             
-        </div>
-    </div>
-
-    <div class="mt-4">
-        <h4>Update Progress</h4>
-        <form method="post" action="{{ url_for('view_campaign', campaign_id=campaign.id) }}">
-            <div class="form-group">
-                <label for="progress">Progress (%):</label>
-                <input type="number" class="form-control" id="progress" name="progress" min="0" max="100" step="1" required>
+            {% if user.role == RoleEnum.INFLUENCER and campaign_id in applied_campaign_ids %}
+            <div class="mt-4">
+                <h4>Update Progress</h4>
+                <form method="post" action="{{ url_for('update_progress', campaign_id=campaign.id) }}">
+                    <div class="form-group">
+                        <label for="progress">Progress (%):</label>
+                        <input type="number" class="form-control" id="progress" name="progress" min="0" max="100" step="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Update Progress</button>
+                </form>
             </div>
-            <button type="submit" class="btn btn-primary mt-2">Update Progress</button>
-        </form>
+            {% endif %}
+            
+        </div>
     </div>
 </div>
 {% endblock %}
