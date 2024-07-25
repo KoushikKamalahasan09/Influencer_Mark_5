@@ -45,19 +45,23 @@ class Influencer(db.Model):
 # Campaign model
 class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    sponsor_id = db.Column(db.Integer, db.ForeignKey('sponsor.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    end_date = db.Column(db.DateTime, nullable=False)
-    budget = db.Column(db.Float, nullable=False)
-    visibility = db.Column(db.String(10), nullable=False)
-    goals = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    applications = db.relationship('CampaignApplication', backref='campaign', lazy=True)
+    description = db.Column(db.Text)
+    start_date = db.Column(db.DateTime, default=datetime.now())
+    end_date = db.Column(db.DateTime)
+    budget = db.Column(db.Float)
+    visibility = db.Column(db.String(50), default='public')  # 'public' or 'private'
+    goals = db.Column(db.Text)
+    is_active = db.Column(db.Boolean, default=True)
+    progress = db.Column(db.Float, default=0.0)
+    ad_requests = db.relationship('AdRequest', backref='campaign')
 
-
-
+# Campaign-Influencer association table
+campaign_influencer = db.Table('campaign_influencer',
+    db.Column('campaign_id', db.Integer, db.ForeignKey('campaign.id'), primary_key=True),
+    db.Column('influencer_id', db.Integer, db.ForeignKey('influencer.id'), primary_key=True)
+)
 
 # AdRequest model
 class AdRequest(db.Model):

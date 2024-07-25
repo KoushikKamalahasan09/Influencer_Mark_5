@@ -499,7 +499,7 @@ def stats():
     user = User.query.filter_by(username=username).first()
     if user.role ==RoleEnum.INFLUENCER:
         flash('Access denied.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
     total_campaigns = Campaign.query.count()
     active_campaigns = Campaign.query.filter_by(is_active=True).count()
