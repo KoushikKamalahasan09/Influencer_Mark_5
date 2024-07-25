@@ -571,3 +571,31 @@ def unapply_campaign(campaign_id):
     return redirect(url_for('view_campaign', campaign_id=campaign.id))
     
 
+@app.route('/campaign/<int:campaign_id>', methods=['GET', 'POST'])
+@login_required
+def views_campaign(campaign_id):
+    username = session['username']
+    user = User.query.filter_by(username=username).first()
+    campaign = Campaign.query.get_or_404(campaign_id)
+
+    # Check if user is an influencer and has applied to the campaign
+    if user.role == RoleEnum.INFLUENCER:
+        application = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
+        if not application:
+            flash('You have not applied for this campaign.', 'danger')
+            return redirect(url_for('home'))
+    else:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('home'))
+
+    # Handle progress update
+    if request.method == 'POST':
+        progress = request.form.get('progress', type=float)
+        if 0 <= progress <= 100:
+            campaign.progress = progress
+            db.session.commit()
+            flash('Campaign progress updated successfully!', 'success')
+        else:
+            flash('Invalid progress value. It must be between 0 and 100.', 'danger')
+
+    return render_template('view_campaign.html', campaign=campaign)

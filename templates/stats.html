@@ -45,10 +45,21 @@
                         <td>{{ campaign.title }}</td>
                         <td>
                             <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: {{ campaign.progress }}%;" aria-valuenow="{{ campaign.progress }}" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" role="progressbar" data-progress="{{ campaign.progress }}" aria-valuenow="{{ campaign.progress }}" aria-valuemin="0" aria-valuemax="100">
                                     {{ campaign.progress }}%
                                 </div>
                             </div>
+                            
+                            {% block script %}
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const progressBar = document.querySelector('.progress-bar');
+                                    const progress = progressBar.getAttribute('data-progress');
+                                    progressBar.style.width = progress + '%';
+                                });
+                            </script>
+                            {% endblock %}
+                            
                         </td>
                     </tr>
                     {% endfor %}

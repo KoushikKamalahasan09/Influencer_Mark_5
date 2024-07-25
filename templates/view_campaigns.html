@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}Campaign Details{% endblock %}
+
+{% block style %}
+<style>
+    .progress {
+        height: 25px;
+    }
+    .progress-bar {
+        background-color: #28a745;
+        font-weight: bold;
+        color: #fff;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Campaign Details</h2>
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">{{ campaign.name }}</h4>
+            <p class="card-text">{{ campaign.description }}</p>
+            <p class="card-text"><strong>Start Date:</strong> {{ campaign.start_date.strftime('%Y-%m-%d') }}</p>
+            <p class="card-text"><strong>End Date:</strong> {{ campaign.end_date.strftime('%Y-%m-%d') }}</p>
+            <p class="card-text"><strong>Budget:</strong> ${{ campaign.budget }}</p>
+            <p class="card-text"><strong>Visibility:</strong> {{ campaign.visibility }}</p>
+            <p class="card-text"><strong>Goals:</strong> {{ campaign.goals }}</p>
+            <p class="card-text"><strong>Progress:</strong></p>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" data-progress="{{ campaign.progress }}" aria-valuenow="{{ campaign.progress }}" aria-valuemin="0" aria-valuemax="100">
+                    {{ campaign.progress }}%
+                </div>
+            </div>
+            
+            {% block script %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const progressBar = document.querySelector('.progress-bar');
+                    const progress = progressBar.getAttribute('data-progress');
+                    progressBar.style.width = progress + '%';
+                });
+            </script>
+            {% endblock %}
+            
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h4>Update Progress</h4>
+        <form method="post" action="{{ url_for('views_campaign', campaign_id=campaign.id) }}">
+            <div class="form-group">
+                <label for="progress">Progress (%):</label>
+                <input type="number" class="form-control" id="progress" name="progress" min="0" max="100" step="1" required>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Update Progress</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
