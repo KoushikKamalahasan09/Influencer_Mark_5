@@ -91,7 +91,7 @@ def search():
     query = request.form.get('search') if request.method == 'POST' else request.args.get('search')
     campaigns = []
     if query:
-        campaigns = Campaign.query.filter(Campaign.title.ilike(f'%{query}%')).all()
+        campaigns = Campaign.query.filter(Campaign.name.ilike(f'%{query}%')).all()
 
     return render_template('search.html', query=query, campaigns=campaigns)
 
@@ -431,7 +431,7 @@ def add_campaign():
 @app.route('/category/<int:id>/edit')
 @login_required
 def campaign_edit(id):
-    campaign = campaign.query.get(id)
+    campaign = Campaign.query.get(id)
     return render_template('edit_campaign.html', campaign=campaign)
 
 
@@ -513,3 +513,30 @@ def stats():
                            active_campaigns=active_campaigns,
                            influencers_involved=influencers_involved,
                            campaigns=campaign_progress)
+    
+    
+    
+
+@app.route('/apply_campaign/<int:campaign_id>', methods=['POST'])
+@login_required
+def apply_campaign(campaign_id):
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    campaign = Campaign.query.get_or_404(campaign_id)
+    application = Campaign(user_id=user.id, campaign_id=campaign.id)
+    db.session.add(application)
+    db.session.commit()
+    flash('You have applied for the campaign!', 'success')
+    return redirect(url_for('view_campaign', campaign_id=campaign.id))
+
+@app.route('/campaign/<int:campaign_id>')
+@login_required
+def view_campaign(campaign_id):
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    campaign = Campaign.query.get_or_404(campaign_id)
+    application = Campaign.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
+    return render_template('campaign.html', campaign=campaign, application=application)
+
+    
+
