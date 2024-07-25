@@ -332,15 +332,24 @@ def update_post():
 @app.route('/influencer/home')
 @login_required
 def influencer_home():
-    username=session['username']
-    user = User.query.filter_by(username=username).first()
-    if user.role !=RoleEnum.INFLUENCER:
+    username = session['username']
+    user = User.query.filter_by(username=username).first_or_404()
+    
+    if user.role != RoleEnum.INFLUENCER:
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('index'))
-
+    
+    # Get all public campaigns
     campaigns = Campaign.query.filter_by(visibility='public').all()
+    
+    # Add the 'applied' status for each campaign
+    applied_campaign_ids = {app.campaign_id for app in CampaignApplication.query.filter_by(user_id=user.id).all()}
+    
+    for campaign in campaigns:
+        campaign.applied = campaign.id in applied_campaign_ids
+    
+    return render_template('influencer_home.html', campaigns=campaigns, user=user)
 
-    return render_template('influencer_home.html', campaigns=campaigns,user=user)
 
 @app.route('/sponsor/home')
 @login_required
@@ -574,28 +583,34 @@ def unapply_campaign(campaign_id):
 @app.route('/campaign/<int:campaign_id>', methods=['GET', 'POST'])
 @login_required
 def views_campaign(campaign_id):
-    username = session['username']
-    user = User.query.filter_by(username=username).first()
+    # Fetch the campaign by ID
     campaign = Campaign.query.get_or_404(campaign_id)
-
-    # Check if user is an influencer and has applied to the campaign
-    if user.role == RoleEnum.INFLUENCER:
-        application = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
-        if not application:
-            flash('You have not applied for this campaign.', 'danger')
-            return redirect(url_for('home'))
-    else:
+    
+    # Get the username from the session
+    username = session.get('username')
+    user = User.query.filter_by(username=username).first_or_404()
+    
+    # Check if the user is an influencer
+    if user.role != RoleEnum.INFLUENCER:
         flash('Access denied.', 'danger')
         return redirect(url_for('home'))
 
-    # Handle progress update
+    # Check if the influencer has applied for this campaign
+    influencer_campaign = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign_id).first()
+    
+    if not influencer_campaign:
+        flash('You have not applied to this campaign.', 'danger')
+        return redirect(url_for('home'))
+    
+    # Handle form submission to update progress
     if request.method == 'POST':
-        progress = request.form.get('progress', type=float)
-        if 0 <= progress <= 100:
+        progress = request.form.get('progress', type=int)
+        if progress is not None and 0 <= progress <= 100:
             campaign.progress = progress
             db.session.commit()
             flash('Campaign progress updated successfully!', 'success')
         else:
-            flash('Invalid progress value. It must be between 0 and 100.', 'danger')
-
+            flash('Invalid progress value. Must be between 0 and 100.', 'danger')
+    
     return render_template('view_campaign.html', campaign=campaign)
+

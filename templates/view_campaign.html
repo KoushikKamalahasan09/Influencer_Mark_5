@@ -50,7 +50,7 @@
 
     <div class="mt-4">
         <h4>Update Progress</h4>
-        <form method="post" action="{{ url_for('views_campaign', campaign_id=campaign.id) }}">
+        <form method="post" action="{{ url_for('view_campaign', campaign_id=campaign.id) }}">
             <div class="form-group">
                 <label for="progress">Progress (%):</label>
                 <input type="number" class="form-control" id="progress" name="progress" min="0" max="100" step="1" required>
