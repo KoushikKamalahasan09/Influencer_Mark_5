@@ -554,11 +554,22 @@ def apply_campaign(campaign_id):
 @app.route('/campaign/<int:campaign_id>')
 @login_required
 def view_campaign(campaign_id):
-    username=session['username']
-    user = User.query.filter_by(username=username).first()
+    username = session['username']
+    user = User.query.filter_by(username=username).first_or_404()
     campaign = Campaign.query.get_or_404(campaign_id)
+    
+    # Check if the user has applied for the campaign
     application = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
-    return render_template('campaign.html', campaign=campaign, application=application)
+
+    # Determine if the user is an influencer and has applied for the campaign
+    applied_campaign_ids = [app.campaign_id for app in CampaignApplication.query.filter_by(user_id=user.id).all()]
+    
+    return render_template('view_campaign.html', 
+                           campaign=campaign, 
+                           application=application,
+                           user=user,
+                           applied_campaign_ids=applied_campaign_ids,RoleEnum=RoleEnum)
+
 
 @app.route('/unapply_campaign/<int:campaign_id>', methods=['POST'])
 @login_required

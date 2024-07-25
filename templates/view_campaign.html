@@ -45,7 +45,7 @@
             </script>
             {% endblock %}
             
-            {% if user.role == RoleEnum.INFLUENCER and campaign_id in applied_campaign_ids %}
+            {% if user.role == RoleEnum.INFLUENCER and campaign.id in applied_campaign_ids %}
             <div class="mt-4">
                 <h4>Update Progress</h4>
                 <form method="post" action="{{ url_for('update_progress', campaign_id=campaign.id) }}">
