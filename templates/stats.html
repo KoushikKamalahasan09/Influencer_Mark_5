@@ -43,7 +43,13 @@
                     {% for campaign in campaigns %}
                     <tr>
                         <td>{{ campaign.title }}</td>
-                        <td>{{ campaign.progress }}%</td>
+                        <td>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: {{ campaign.progress }}%;" aria-valuenow="{{ campaign.progress }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ campaign.progress }}%
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

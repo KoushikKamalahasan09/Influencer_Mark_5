@@ -495,16 +495,20 @@ def delete_campaign(campaign_id):
 @app.route('/stats')
 @login_required
 def stats():
-    username=session['username']
+    username = session['username']
     user = User.query.filter_by(username=username).first()
-    if user.role ==RoleEnum.INFLUENCER:
-        flash('Access denied.', 'danger')
-        return redirect(url_for('home'))
 
-    total_campaigns = Campaign.query.count()
-    active_campaigns = Campaign.query.filter_by(is_active=True).count()
-    influencers_involved = db.session.query(Campaign.influencers).distinct().count()
-    campaigns = Campaign.query.all()
+    if user.role == RoleEnum.INFLUENCER:
+        campaigns = Campaign.query.join(CampaignApplication).filter(CampaignApplication.user_id == user.id).all()
+    elif user.role == RoleEnum.SPONSOR:
+        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+        campaigns = Campaign.query.filter_by(sponsor_id=sponsor.id).all()
+    else:  # Admin
+        campaigns = Campaign.query.all()
+
+    total_campaigns = len(campaigns)
+    active_campaigns = len([campaign for campaign in campaigns if campaign.is_active])
+    influencers_involved = len(set(influencer.id for campaign in campaigns for influencer in campaign.influencers))
 
     campaign_progress = [{'title': campaign.name, 'progress': campaign.progress} for campaign in campaigns]
 
@@ -512,9 +516,8 @@ def stats():
                            total_campaigns=total_campaigns,
                            active_campaigns=active_campaigns,
                            influencers_involved=influencers_involved,
-                           campaigns=campaign_progress)
-    
-    
+                           campaigns=campaign_progress,
+                           user_role=user.role)
     
 
 @app.route('/apply_campaign/<int:campaign_id>', methods=['POST'])
@@ -546,10 +549,7 @@ def view_campaign(campaign_id):
     user = User.query.filter_by(username=username).first()
     campaign = Campaign.query.get_or_404(campaign_id)
     application = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
-    campaigns = Campaign.query.all()
-    user_applications = CampaignApplication.query.filter_by(user_id=user.id).all()
-    applied_campaign_ids = [application.campaign_id for application in user_applications]
-    return render_template('campaign.html', campaign=campaign, application=application,campaigns=campaigns,applied_campaign_ids=applied_campaign_ids)
+    return render_template('campaign.html', campaign=campaign, application=application)
 
 @app.route('/unapply_campaign/<int:campaign_id>', methods=['POST'])
 @login_required
