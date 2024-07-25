@@ -91,7 +91,6 @@ class CampaignApplication(db.Model):
 
 
 
-
 with app.app_context():
     db.create_all()
     admin = User.query.filter_by(role=RoleEnum.ADMIN).first()

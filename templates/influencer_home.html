@@ -10,7 +10,10 @@
                 <li class="list-group-item">
                     <h4>{{ campaign.name }}</h4>
                     <p>{{ campaign.description }}</p>
-                    <a href="{{ url_for('apply_campaign', campaign_id=campaign.id) }}" class="btn btn-primary">Apply</a>
+                    <form action="{{ url_for('apply_campaign', campaign_id=campaign.id) }}" method="POST">
+                        <button type="submit" class="btn btn-primary">Apply</button>
+                    </form>                    
+                    
                 </li>
             {% endfor %}
         </ul>

@@ -1,6 +1,6 @@
 from main import app
 from flask import Flask, render_template, request, redirect, session, url_for, flash
-from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign, AdRequest, Flag
+from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign, AdRequest, Flag,CampaignApplication
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
@@ -520,14 +520,24 @@ def stats():
 @app.route('/apply_campaign/<int:campaign_id>', methods=['POST'])
 @login_required
 def apply_campaign(campaign_id):
-    username=session['username']
+    username = session['username']
     user = User.query.filter_by(username=username).first()
     campaign = Campaign.query.get_or_404(campaign_id)
-    application = Campaign(user_id=user.id, campaign_id=campaign.id)
+    
+    # Check if the user has already applied to the campaign
+    existing_application = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
+    if existing_application:
+        flash('You have already applied for this campaign.', 'warning')
+        return redirect(url_for('view_campaign', campaign_id=campaign.id))
+    
+    # Create a new CampaignApplication
+    application = CampaignApplication(user_id=user.id, campaign_id=campaign.id)
     db.session.add(application)
     db.session.commit()
+    
     flash('You have applied for the campaign!', 'success')
     return redirect(url_for('view_campaign', campaign_id=campaign.id))
+
 
 @app.route('/campaign/<int:campaign_id>')
 @login_required
@@ -535,7 +545,7 @@ def view_campaign(campaign_id):
     username=session['username']
     user = User.query.filter_by(username=username).first()
     campaign = Campaign.query.get_or_404(campaign_id)
-    application = Campaign.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
+    application = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
     return render_template('campaign.html', campaign=campaign, application=application)
 
     
