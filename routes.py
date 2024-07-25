@@ -373,12 +373,17 @@ def campaigns():
     if user.role==RoleEnum.INFLUENCER:
         flash('Access denied.', 'danger')
         return redirect(url_for('home'))
-    campaign = Campaign.query.all()
-    return render_template('campaigns.html', campaign=campaign)
+    campaigns = Campaign.query.all()
+    return render_template('campaigns.html', campaigns=campaigns)
 
 @app.route('/campaign/add')
 @login_required
 def campaign_add():
+    username=session['username']
+    user=User.query.filter_by(username=username).first()
+    if user.role != RoleEnum.SPONSOR:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home'))
     return render_template('add_campaign.html')
 
 
@@ -492,8 +497,10 @@ def delete_campaign(campaign_id):
     user = User.query.filter_by(username=username).first()
     campaign = Campaign.query.get_or_404(campaign_id)
     if user.role !=RoleEnum.SPONSOR or campaign.sponsor.user_id != user.id:
-        flash('Unauthorized access.', 'danger')
-        return redirect(url_for('index'))
+        if user.role!=RoleEnum.ADMIN:
+            
+            flash('Unauthorized access.', 'danger')
+            return redirect(url_for('home'))
 
     db.session.delete(campaign)
     db.session.commit()
