@@ -10,10 +10,15 @@
                 <li class="list-group-item">
                     <h4>{{ campaign.name }}</h4>
                     <p>{{ campaign.description }}</p>
-                    <form action="{{ url_for('apply_campaign', campaign_id=campaign.id) }}" method="POST">
-                        <button type="submit" class="btn btn-primary">Apply</button>
-                    </form>                    
-                    
+                    {% if campaign.id in applied_campaign_ids %}
+                        <form action="{{ url_for('unapply_campaign', campaign_id=campaign.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Unapply</button>
+                        </form>
+                    {% else %}
+                        <form action="{{ url_for('apply_campaign', campaign_id=campaign.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-primary">Apply</button>
+                        </form>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

@@ -546,7 +546,28 @@ def view_campaign(campaign_id):
     user = User.query.filter_by(username=username).first()
     campaign = Campaign.query.get_or_404(campaign_id)
     application = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
-    return render_template('campaign.html', campaign=campaign, application=application)
+    campaigns = Campaign.query.all()
+    user_applications = CampaignApplication.query.filter_by(user_id=user.id).all()
+    applied_campaign_ids = [application.campaign_id for application in user_applications]
+    return render_template('campaign.html', campaign=campaign, application=application,campaigns=campaigns,applied_campaign_ids=applied_campaign_ids)
 
+@app.route('/unapply_campaign/<int:campaign_id>', methods=['POST'])
+@login_required
+def unapply_campaign(campaign_id):
+    username = session['username']
+    user = User.query.filter_by(username=username).first()
+    campaign = Campaign.query.get_or_404(campaign_id)
+
+    # Find the existing application to delete
+    application = CampaignApplication.query.filter_by(user_id=user.id, campaign_id=campaign.id).first()
+
+    if application:
+        db.session.delete(application)  # Remove the application
+        db.session.commit()  # Commit the change
+        flash('You have successfully removed your application for this campaign!', 'success')
+    else:
+        flash('You have not applied for this campaign.')
+
+    return redirect(url_for('view_campaign', campaign_id=campaign.id))
     
 
