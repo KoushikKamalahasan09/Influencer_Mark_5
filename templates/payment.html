@@ -41,7 +41,7 @@
         <div class="card-body">
             <p><strong>Sponsor:</strong> {{ sponsor.company_name }}</p>
             <p><strong>Influencer:</strong> {{ influencer.username }}</p>
-            <p><strong>Budget:</strong> ${{ campaign.budget }}</p>
+            <p><strong>Payment:</strong> ${{ campaign.budget }}</p>
 
             <form action="{{ url_for('complete_payment', campaign_id=campaign.id) }}" method="POST">
                 <button class="btn btn-primary btn-block mt-3" type="submit">Complete Payment</button>

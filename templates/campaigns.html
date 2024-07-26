@@ -56,9 +56,12 @@
                 <td>{{ campaign.name }}</td>
                 <td>{{ campaign.description }}</td>
                 <td class="btn-container">
-                    <a href="{{ url_for('campaign_edit',id=campaign.id) }}" class="btn btn-secondary">
-                        <i class="fa fa-edit"></i> Edit
-                    </a>
+                    {% if user.role==RoleEnum.SPONSOR %}
+                        <a href="{{ url_for('campaign_edit',id=campaign.id) }}" class="btn btn-secondary">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+                    {% endif %}
+                    
                     <form action="{{ url_for('delete_campaign', campaign_id=campaign.id) }}" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-danger">
                             <i class="fa fa-trash"></i> Delete
