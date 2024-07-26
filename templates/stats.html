@@ -60,16 +60,6 @@
                                     {{ campaign.progress }}%
                                 </div>
                             </div>
-                            
-                            {% block script %}
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    const progressBar = document.querySelector('.progress-bar');
-                                    const progress = progressBar.getAttribute('data-progress');
-                                    progressBar.style.width = progress + '%';
-                                });
-                            </script>
-                            {% endblock %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -78,4 +68,16 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(function(progressBar) {
+            const progress = progressBar.getAttribute('data-progress');
+            progressBar.style.width = progress + '%';
+        });
+    });
+</script>
 {% endblock %}
