@@ -13,11 +13,22 @@
         color: #fff;
         text-align: center;
     }
+    .campaign-details {
+        max-width: 800px;
+        margin: auto;
+    }
+    .campaign-details .card {
+        margin-top: 20px;
+    }
+    .campaign-details h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container campaign-details">
     <h2>Campaign Details</h2>
     <div class="card">
         <div class="card-body">
@@ -29,7 +40,7 @@
             <p class="card-text"><strong>Visibility:</strong> {{ campaign.visibility }}</p>
             <p class="card-text"><strong>Goals:</strong> {{ campaign.goals }}</p>
             <p class="card-text"><strong>Progress:</strong></p>
-            <div class="progress">
+            <div class="progress mb-3">
                 <div class="progress-bar" role="progressbar" data-progress="{{ campaign.progress }}" aria-valuenow="{{ campaign.progress }}" aria-valuemin="0" aria-valuemax="100">
                     {{ campaign.progress }}%
                 </div>

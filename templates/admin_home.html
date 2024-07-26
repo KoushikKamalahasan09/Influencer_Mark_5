@@ -1,12 +1,27 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container">
-    <h2>Welcome, Admin!</h2>
-    <div class="card mt-4">
+<style>
+    .welcome-text h2 {
+        font-size: 2rem;
+        color: #007bff;
+    }
+    .card-title {
+        font-size: 1.5rem;
+        color: #007bff;
+    }
+</style>
+
+<div class="container my-4">
+    <div class="text-center welcome-text mb-4">
+        <h2>Welcome, Admin!</h2>
+    </div>
+    <div class="card mt-4 shadow-sm">
         <div class="card-body">
-            <h4 class="card-title">Users</h4>
-            <a href="{{ url_for('list_users') }}" class="btn btn-primary">Manage Users</a>
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Users</h4>
+                <a href="{{ url_for('list_users') }}" class="btn btn-primary">Manage Users</a>
+            </div>
         </div>
     </div>
 </div>
