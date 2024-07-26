@@ -3,8 +3,9 @@ from flask import Flask, render_template, request, redirect, session, url_for, f
 from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign,CampaignApplication
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-import weasyprint
-from weasyprint import HTML
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import io
 from datetime import datetime
 # routes
 
@@ -746,17 +747,35 @@ def generate_bill(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     sponsor = User.query.get_or_404(campaign.sponsor_id)
     influencer = CampaignApplication.query.filter_by(campaign_id=campaign.id).first().user
-    
-    rendered = render_template('bill_template.html', campaign=campaign, sponsor=sponsor, influencer=influencer)
-    pdf = weasyprint.HTML(string=rendered).write_pdf()
-    
+
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    p = canvas.Canvas(buffer, pagesize=letter)
+
+    # Draw things on the PDF. Here's where you can use the campaign, sponsor, and influencer data.
+    p.setFont("Helvetica", 12)
+    p.drawString(100, 750, f"Bill for Campaign: {campaign.name}")
+    p.drawString(100, 730, f"Sponsor: {sponsor.username}")
+    p.drawString(100, 710, f"Influencer: {influencer.username}")
+    p.drawString(100, 690, f"Budget: ${campaign.budget}")
+    p.drawString(100, 670, f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # Close the PDF object cleanly.
+    p.showPage()
+    p.save()
+
+    # Get the value of the BytesIO buffer and write it to the response.
+    buffer.seek(0)
+    pdf = buffer.getvalue()
+    buffer.close()
+
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = f'attachment; filename=bill_{campaign.id}.pdf'
     
     return response
-
-
 @app.route('/payment/<int:campaign_id>/complete', methods=['POST'])
 @login_required
 def complete_payment(campaign_id):
