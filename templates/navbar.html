@@ -8,34 +8,36 @@
       <ul class="navbar-nav ms-auto">
         {% if 'username' in session %}
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for('home')}}">Home</a>
+            <a class="nav-link" href="{{ url_for('home') }}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+            <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
           </li>
+          {% if session.get('role') != 'influencer' %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('campaigns') }}">Campaigns</a>
+            </li>
+          {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for('campaigns')}}">Campaigns</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{url_for('stats')}}">Stats</a>
+            <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
           </li>
           <form class="form-inline my-2 my-lg-0" action="{{ url_for('search') }}" method="POST">
             <input class="form-control mr-sm-2" type="search" placeholder="Search campaigns" aria-label="Search" name="search">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
           </form>
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
           </li>
         {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for('login')}}">Login</a>
+            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for('sponsor_register')}}">Sponser Register</a>
+            <a class="nav-link" href="{{ url_for('sponsor_register') }}">Sponsor Register</a>
           </li>
           <li class="nav-item">
-              <a class="nav-link" href="{{url_for('influencer_register')}}">Influencer Register</a>
-            </li>
+            <a class="nav-link" href="{{ url_for('influencer_register') }}">Influencer Register</a>
+          </li>
         {% endif %}
       </ul>
     </div>

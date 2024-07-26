@@ -64,6 +64,7 @@ def login_post():
         flash("Username or password is incorrect")
         return redirect(url_for('login'))
     session['username'] = username
+    session['role']=user.role.value
     return redirect(url_for('home'))
 
 @app.route('/sponsor_register')
