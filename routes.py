@@ -4,6 +4,7 @@ from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign,CampaignApp
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import weasyprint
+from weasyprint import HTML
 from datetime import datetime
 # routes
 
