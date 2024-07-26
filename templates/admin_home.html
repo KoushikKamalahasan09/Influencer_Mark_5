@@ -1,1 +1,13 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Welcome, Admin!</h2>
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4 class="card-title">Users</h4>
+            <a href="{{ url_for('list_users') }}" class="btn btn-primary">Manage Users</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

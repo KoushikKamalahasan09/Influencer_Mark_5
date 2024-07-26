@@ -81,9 +81,27 @@ def logout():
 @app.route('/admin')
 @admin_required
 def admin():
-    users = User.query.all()
-    return render_template('admin_home.html', users=users)
+    username = session['username']
+    user = User.query.filter_by(username=username).first()
+    return render_template('admin_home.html',user=user)
 
+@app.route('/admin/users')
+@admin_required
+def list_users():
+    users = User.query.all()
+    return render_template('list_users.html', users=users,RoleEnum=RoleEnum)
+
+@app.route('/admin/users/delete/<int:user_id>', methods=['POST'])
+@admin_required
+def delete_user(user_id):
+    user_to_delete = User.query.get_or_404(user_id)
+    if user_to_delete.role == RoleEnum.ADMIN:
+        flash('Admin accounts cannot be deleted.', 'danger')
+        return redirect(url_for('list_users'))
+    db.session.delete(user_to_delete)
+    db.session.commit()
+    flash('User has been deleted.', 'success')
+    return redirect(url_for('list_users'))
 
 @app.route('/search', methods=['GET', 'POST'])
 @login_required
@@ -206,9 +224,6 @@ def update_profile():
     else:
         return render_template('update_admin.html',user=user) 
         
-
-
-
 
 @app.route('/profile/update',methods=['POST'])
 @login_required
@@ -349,6 +364,54 @@ def influencer_home():
         campaign.applied = campaign.id in applied_campaign_ids
     
     return render_template('influencer_home.html', campaigns=campaigns, user=user)
+
+@app.route('/profile/delete/confirmation')
+@login_required
+def delete_profile_confirmation():
+    username = session['username']
+    user = User.query.filter_by(username=username).first()
+    return render_template('delete_profile_confirmation.html', user=user)
+
+@app.route('/sponsor/delete/confirmation')
+@login_required
+def delete_sponsor_confirmation():
+    username = session['username']
+    user = User.query.filter_by(username=username).first()
+    return render_template('delete_sponsor_confirmation.html', user=user)
+
+
+@app.route('/profile/delete', methods=['POST'])
+@login_required
+def delete_profile():
+    username = session['username']
+    user = User.query.filter_by(username=username).first()
+    
+    if user.role == RoleEnum.INFLUENCER:
+        # Delete campaign applications
+        CampaignApplication.query.filter_by(user_id=user.id).delete()
+        
+        # Delete influencer profile
+        influencer = Influencer.query.filter_by(user_id=user.id).first()
+        db.session.delete(influencer)
+        
+    elif user.role==RoleEnum.ADMIN:
+        flash('Admin accounts cannot be deleted.', 'danger')
+        return redirect(url_for('home'))
+    
+    else:
+        sponsor=Sponsor.query.filter_by(user_id=user.id).first()
+        Campaign.query.filter_by(sponsor_id=sponsor.id).delete()
+        sponsor = Sponsor.query.filter_by(user_id=user.id).first()
+        db.session.delete(sponsor)
+    
+    # Delete user account
+    db.session.delete(user)
+    db.session.commit()
+    
+    session.clear()
+    flash('Your account has been deleted.', 'success')
+    return redirect(url_for('home'))
+
 
 
 @app.route('/sponsor/home')
