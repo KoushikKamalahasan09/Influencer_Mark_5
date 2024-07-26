@@ -55,7 +55,6 @@ class Campaign(db.Model):
     goals = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
     progress = db.Column(db.Float, default=0.0)
-    ad_requests = db.relationship('AdRequest', backref='campaign')
 
 # Campaign-Influencer association table
 campaign_influencer = db.Table('campaign_influencer',
@@ -63,23 +62,7 @@ campaign_influencer = db.Table('campaign_influencer',
     db.Column('influencer_id', db.Integer, db.ForeignKey('influencer.id'), primary_key=True)
 )
 
-# AdRequest model
-class AdRequest(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
-    influencer_id = db.Column(db.Integer, db.ForeignKey('influencer.id'), nullable=False)
-    messages = db.Column(db.Text)
-    requirements = db.Column(db.Text)
-    payment_amount = db.Column(db.Float)
-    status = db.Column(db.String(50), default='Pending')  # 'Pending', 'Accepted', 'Rejected'
 
-# Flag model (for inappropriate campaigns/users)
-class Flag(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=True)
-    reason = db.Column(db.Text)
-    flagged_at = db.Column(db.DateTime, default=datetime.now())
     
 class CampaignApplication(db.Model):
     id = db.Column(db.Integer, primary_key=True)

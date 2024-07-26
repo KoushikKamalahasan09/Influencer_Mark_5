@@ -1,6 +1,6 @@
 from main import app
 from flask import Flask, render_template, request, redirect, session, url_for, flash
-from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign, AdRequest, Flag,CampaignApplication
+from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign,CampaignApplication
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
@@ -437,7 +437,7 @@ def campaigns():
         flash('Access denied.', 'danger')
         return redirect(url_for('home'))
     campaigns = Campaign.query.all()
-    return render_template('campaigns.html', campaigns=campaigns)
+    return render_template('campaigns.html', campaigns=campaigns,RoleEnum=RoleEnum,user=user)
 
 @app.route('/campaign/add')
 @login_required
@@ -725,3 +725,4 @@ def update_progress(campaign_id):
         flash('Invalid progress value.', 'danger')
     
     return redirect(url_for('view_campaign', campaign_id=campaign_id))
+
