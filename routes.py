@@ -1,8 +1,9 @@
 from main import app
-from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask import Flask, render_template, request, redirect, session, url_for, flash,make_response
 from models import RoleEnum ,db, User, Sponsor, Influencer ,Campaign,CampaignApplication
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+import weasyprint
 from datetime import datetime
 # routes
 
@@ -720,9 +721,51 @@ def update_progress(campaign_id):
     if new_progress is not None and 0 <= new_progress <= 100:
         campaign.progress = new_progress
         db.session.commit()
+        if campaign.progress == 100:
+            return redirect(url_for('payment_page', campaign_id=campaign.id))
         flash('Progress updated successfully!', 'success')
     else:
         flash('Invalid progress value.', 'danger')
     
     return redirect(url_for('view_campaign', campaign_id=campaign_id))
 
+@app.route('/payment/<int:campaign_id>')
+@login_required
+def payment_page(campaign_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
+    sponsor = User.query.get_or_404(campaign.sponsor_id)
+    influencer = CampaignApplication.query.filter_by(campaign_id=campaign.id).first().user
+    return render_template('payment.html', campaign=campaign, sponsor=sponsor, influencer=influencer)
+
+
+@app.route('/payment/<int:campaign_id>/generate_bill')
+@login_required
+def generate_bill(campaign_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
+    sponsor = User.query.get_or_404(campaign.sponsor_id)
+    influencer = CampaignApplication.query.filter_by(campaign_id=campaign.id).first().user
+    
+    rendered = render_template('bill_template.html', campaign=campaign, sponsor=sponsor, influencer=influencer)
+    pdf = weasyprint.HTML(string=rendered).write_pdf()
+    
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=bill_{campaign.id}.pdf'
+    
+    return response
+
+
+@app.route('/payment/<int:campaign_id>/complete', methods=['POST'])
+@login_required
+def complete_payment(campaign_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
+    
+    # Delete campaign applications first
+    CampaignApplication.query.filter_by(campaign_id=campaign.id).delete()
+    
+    # Delete the campaign
+    db.session.delete(campaign)
+    db.session.commit()
+    
+    flash('Payment completed and campaign deleted.', 'success')
+    return redirect(url_for('influencer_home'))

@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Payment for Campaign: {{ campaign.name }}</h2>
+    <p><strong>Sponsor:</strong> {{ sponsor.company_name }}</p>
+    <p><strong>Influencer:</strong> {{ influencer.username }}</p>
+    <p><strong>Budget:</strong> ${{ campaign.budget }}</p>
+
+    <form action="{{ url_for('complete_payment', campaign_id=campaign.id) }}" method="POST">
+        <button class="btn btn-primary" type="submit">Complete Payment</button>
+    </form>
+    
+    <a href="{{ url_for('generate_bill', campaign_id=campaign.id) }}" class="btn btn-secondary mt-2">Download Bill</a>
+</div>
+{% endblock %}
