@@ -5,16 +5,14 @@
             <div class="alert alert-success flash-message" role="alert">
                 {{ message }}
             </div>
+        {% elif category == "danger" %}
+            <div class="alert alert-danger flash-message" role="alert">
+                {{ message }}
+            </div>
         {% else %}
-            {% if category == "danger" %}
-                <div class="alert alert-danger flash-message" role="alert">
-                    {{ message }}
-                </div>
-            {% else %}
-                <div class="alert alert-info flash-message" role="alert">
-                    {{ message }}
-                </div>
-            {% endif %}
+            <div class="alert alert-info flash-message" role="alert">
+                {{ message }}
+            </div>
         {% endif %}
     {% endfor %}
 {% endif %}
@@ -28,16 +26,6 @@
         padding: 15px;
         border-radius: 5px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    .alert-success {
-        background-color: #d4edda;
-        border-color: #c3e6cb;
-        color: #155724;
-    }
-    .alert-danger {
-        background-color: #f8d7da;
-        border-color: #f5c6cb;
-        color: #721c24;
     }
 </style>
 {% endblock %}

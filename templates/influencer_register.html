@@ -1,79 +1,81 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <h1>Register</h1>
-    <form action="" method="POST" class="register-form">
-        <label for="email" class="form-label">Email:</label>
-        <input type="text" name="email" class="form-control">
-
-        <label for="username" class="form-label">Username:</label>
-        <input type="text" name="username" class="form-control">
-
-
-        <label for="category" class="form-label">Category:</label>
-        <input type="text" name="category" class="form-control">
-
-
-        <label for="platform" class="form-label">Platform:</label>
-        <input type="text" name="platform" class="form-control">
-
-
-        <label for="name" class="form-label">Name:</label>
-        <input type="text" name="name" class="form-control">
-
-
-        <label for="reach" class="form-label">Reach:</label>
-        <input type="number" name="reach" class="form-control">
-
-
-        <label for="password" class="form-label">Password:</label>
-        <input type="password" name="password" class="form-control">
-
-        <label for="confirm" class="form-label">Confirm Password:</label>
-        <input type="password" name="confirm" class="form-control">
-
-        <button class="btn btn-success">Register</button>
-    </form>
-    <a href="/login" class="login-link">Login</a>
-    <a href="/Sponsor_register" class="register-link">Sponsor Register</a>
+    <div class="register-container">
+        <h1 class="text-center mb-4">Register as Influencer</h1>
+        <form action="" method="POST" class="register-form">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="text" name="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username:</label>
+                <input type="text" name="username" class="form-control" id="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category:</label>
+                <input type="text" name="category" class="form-control" id="category" required>
+            </div>
+            <div class="mb-3">
+                <label for="platform" class="form-label">Platform:</label>
+                <input type="text" name="platform" class="form-control" id="platform" required>
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" name="name" class="form-control" id="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="reach" class="form-label">Reach:</label>
+                <input type="number" name="reach" class="form-control" id="reach" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password:</label>
+                <input type="password" name="password" class="form-control" id="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="confirm" class="form-label">Confirm Password:</label>
+                <input type="password" name="confirm" class="form-control" id="confirm" required>
+            </div>
+            <button class="btn btn-success w-100">Register</button>
+        </form>
+        <div class="text-center mt-3">
+            <a href="/login" class="login-link">Login</a>
+        </div>
+        <div class="text-center mt-2">
+            <a href="/Sponsor_register" class="register-link">Sponsor Register</a>
+        </div>
+    </div>
 {% endblock %}
 
 {% block style %}
 <style>
-    .register-form {
-        max-width: 400px;
-        margin-top: 20px;
+    .register-container {
+        max-width: 500px;
+        margin: 0 auto;
         padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         background-color: #f9f9f9;
+        margin-top: 50px;
     }
 
-    .form-label {
-        margin-top: 10px;
+    .register-form .form-label {
         font-weight: bold;
     }
 
-    .form-control {
+    .register-form .form-control {
         margin-bottom: 10px;
         padding: 10px;
-        border: 1px solid #ccc;
         border-radius: 5px;
     }
 
-    .btn-success {
-        margin-top: 10px;
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        background-color: #28a745;
-        border-color: #28a745;
+    .register-form .btn-success {
+        font-size: 16px;
     }
 
-    .login-link {
-        display: block;
-        margin-top: 10px;
-        text-align: center;
+    .login-link, .register-link {
+        font-size: 14px;
     }
 </style>
 {% endblock %}

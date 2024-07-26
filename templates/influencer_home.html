@@ -1,32 +1,66 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container">
-    <h2>Welcome, {{ user.username }}!</h2>
-    <h3>Available Campaigns</h3>
+<div class="container mt-4">
+    <h2 class="text-center">Welcome, {{ user.username }}!</h2>
+    <h3 class="mt-4">Available Campaigns</h3>
     {% if campaigns %}
         <ul class="list-group">
             {% for campaign in campaigns %}
-                <li class="list-group-item">
-                    <h4>{{ campaign.name }}</h4>
-                    <p>{{ campaign.description }}</p>
-                    {% if campaign.applied %}
-                        <form action="{{ url_for('view_campaign', campaign_id=campaign.id) }}" method="GET" style="display:inline;">
+                <li class="list-group-item mb-3">
+                    <h4 class="campaign-title">{{ campaign.name }}</h4>
+                    <p class="campaign-description">{{ campaign.description }}</p>
+                    <div class="d-flex justify-content-end">
+                        <form action="{{ url_for('view_campaign', campaign_id=campaign.id) }}" method="GET" class="me-2">
                             <button type="submit" class="btn btn-info">View Details</button>
                         </form>
-                        <form action="{{ url_for('unapply_campaign', campaign_id=campaign.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-danger">Unapply</button>
-                        </form>
-                    {% else %}
-                        <form action="{{ url_for('apply_campaign', campaign_id=campaign.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-primary">Apply</button>
-                        </form>
-                    {% endif %}
+                        {% if campaign.applied %}
+                            <form action="{{ url_for('unapply_campaign', campaign_id=campaign.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger">Unapply</button>
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('apply_campaign', campaign_id=campaign.id) }}" method="POST">
+                                <button type="submit" class="btn btn-primary">Apply</button>
+                            </form>
+                        {% endif %}
+                    </div>
                 </li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>No campaigns available at the moment.</p>
+        <p class="text-center mt-4">No campaigns available at the moment.</p>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .campaign-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .campaign-description {
+        margin-bottom: 10px;
+    }
+
+    .list-group-item {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+    }
+
+    .btn-info, .btn-primary, .btn-danger {
+        min-width: 100px;
+    }
+
+    .container {
+        max-width: 800px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+</style>
 {% endblock %}
