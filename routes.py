@@ -512,6 +512,11 @@ def add_campaign():
 @app.route('/category/<int:id>/edit')
 @login_required
 def campaign_edit(id):
+    username=session['username']
+    user = User.query.filter_by(username=username).first()
+    if user.role!=RoleEnum.SPONSOR:
+            flash('Unauthorized access.', 'danger')
+            return redirect(url_for('home'))
     campaign = Campaign.query.get(id)
     return render_template('edit_campaign.html', campaign=campaign)
 
@@ -737,7 +742,7 @@ def update_progress(campaign_id):
 def payment_page(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     sponsor = User.query.get_or_404(campaign.sponsor_id)
-    influencer = CampaignApplication.query.filter_by(campaign_id=campaign.id).first().user
+    influencer = CampaignApplication.query.filter_by(campaign_id=campaign.id).first()
     return render_template('payment.html', campaign=campaign, sponsor=sponsor, influencer=influencer)
 
 
@@ -745,9 +750,10 @@ def payment_page(campaign_id):
 @login_required
 def generate_bill(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
-    sponsor = User.query.get_or_404(campaign.sponsor_id)
-    influencer = CampaignApplication.query.filter_by(campaign_id=campaign.id).first().user
-
+    sponsor = Sponsor.query.get_or_404(campaign.sponsor_id)
+    campaignapp = CampaignApplication.query.filter_by(campaign_id=campaign.id).first()
+    influencer=Influencer.query.filter_by(user_id=campaignapp.user_id).first()
+    
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
@@ -757,8 +763,8 @@ def generate_bill(campaign_id):
     # Draw things on the PDF. Here's where you can use the campaign, sponsor, and influencer data.
     p.setFont("Helvetica", 12)
     p.drawString(100, 750, f"Bill for Campaign: {campaign.name}")
-    p.drawString(100, 730, f"Sponsor: {sponsor.username}")
-    p.drawString(100, 710, f"Influencer: {influencer.username}")
+    p.drawString(100, 730, f"Sponsor: {sponsor.company_name}")
+    p.drawString(100, 710, f"Influencer: {influencer.name}")
     p.drawString(100, 690, f"Budget: ${campaign.budget}")
     p.drawString(100, 670, f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
