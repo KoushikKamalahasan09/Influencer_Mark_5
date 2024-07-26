@@ -1,37 +1,51 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <h1>Add Campaign</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">Add Campaign</h1>
     <hr>
     <form action="" method="post" class="add-campaign-form">
-        <label class="form-label" for="name">Campaign Name:</label>
-        <input class="form-control" type="text" name="name" id="name" maxlength="15">
-
-        <label class="form-label" for="description">Description:</label>
-        <textarea name="description" id="description" cols="30" rows="10" maxlength="250" class="form-control"></textarea>
-  
-        <label class="form-label" for="start_date">Start Date:</label>
-        <input class="form-control" type="date" name="start_date" id="start_date">
+        <div class="mb-3">
+            <label class="form-label" for="name">Campaign Name:</label>
+            <input class="form-control" type="text" name="name" id="name" maxlength="15" placeholder="Enter campaign name">
+        </div>
         
-        <label class="form-label" for="end_date">End Date:</label>
-        <input class="form-control" type="date" name="end_date" id="end_date">
+        <div class="mb-3">
+            <label class="form-label" for="description">Description:</label>
+            <textarea name="description" id="description" cols="30" rows="5" maxlength="250" class="form-control" placeholder="Enter campaign description"></textarea>
+        </div>
         
-
-        <label class="form-label" for="budget">Budget:</label>
-        <input class="form-control" type="number" name="budget" id="budget">
-
-        <label class="form-label" for="visibility">Visibility:</label>
-        <select id="choice" name="visibility">
-            <option value="public" selected>Public</option>
-            <option value="private">private</option>
-        </select>
+        <div class="mb-3">
+            <label class="form-label" for="start_date">Start Date:</label>
+            <input class="form-control" type="date" name="start_date" id="start_date">
+        </div>
         
-        <label class="form-label" for="goals">Goals:</label>
-        <input class="form-control" type="text" name="goals" id="goals" maxlength="50">
+        <div class="mb-3">
+            <label class="form-label" for="end_date">End Date:</label>
+            <input class="form-control" type="date" name="end_date" id="end_date">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="budget">Budget:</label>
+            <input class="form-control" type="number" name="budget" id="budget" placeholder="Enter budget">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="visibility">Visibility:</label>
+            <select class="form-select" id="choice" name="visibility">
+                <option value="public" selected>Public</option>
+                <option value="private">Private</option>
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label" for="goals">Goals:</label>
+            <input class="form-control" type="text" name="goals" id="goals" maxlength="50" placeholder="Enter campaign goals">
+        </div>
         
         <button type="submit" class="btn btn-success">
-            <i class="fa fa-plus" aria-hidden="true"></i>
-            Create
+            <i class="fa fa-plus" aria-hidden="true"></i> Create
         </button>
     </form>
+</div>
 {% endblock %}

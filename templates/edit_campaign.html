@@ -1,36 +1,74 @@
 {% extends 'layout.html' %}
 
+{% block title %}Edit Campaign{% endblock %}
+
+{% block style %}
+<style>
+    .edit-campaign-form {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .edit-campaign-form h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .edit-campaign-form label {
+        margin-top: 10px;
+    }
+    .edit-campaign-form .btn {
+        display: block;
+        width: 100%;
+        margin-top: 20px;
+    }
+</style>
+{% endblock style %}
+
 {% block content %}
+<div class="container mt-5">
     <h1>Edit Campaign</h1>
     <hr>
     <form action="" method="post" class="edit-campaign-form">
-        <label class="form-label" for="name">Campaign Name:</label>
-        <input class="form-control" type="text" name="name" id="name" maxlength="15" value="{{ campaign.name }}>
+        <div class="mb-3">
+            <label class="form-label" for="name">Campaign Name:</label>
+            <input class="form-control" type="text" name="name" id="name" maxlength="15" value="{{ campaign.name }}">
+        </div>
 
-        <label class="form-label" for="description">Description:</label>
-        <textarea name="description" id="description" cols="30" rows="10" maxlength="250" class="form-control">{{ campaign.description }}</textarea>
+        <div class="mb-3">
+            <label class="form-label" for="description">Description:</label>
+            <textarea name="description" id="description" cols="30" rows="5" maxlength="250" class="form-control">{{ campaign.description }}</textarea>
+        </div>
 
-        <label class="form-label" for="start_date">Start Date:</label>
-        <input class="form-control" type="date" name="start_date" id="start_date" value ={{campaign.start_date}}>
+        <div class="mb-3">
+            <label class="form-label" for="start_date">Start Date:</label>
+            <input class="form-control" type="date" name="start_date" id="start_date" value="{{ campaign.start_date }}">
+        </div>
 
-        <label class="form-label" for="end_date">End Date:</label>
-        <input class="form-control" type="date" name="end_date" id="end_date"value={{campaign.end_date}}>
+        <div class="mb-3">
+            <label class="form-label" for="end_date">End Date:</label>
+            <input class="form-control" type="date" name="end_date" id="end_date" value="{{ campaign.end_date }}">
+        </div>
 
-        <label class="form-label" for="budget">Budget:</label>
-        <input class="form-control" type="number" name="budget" id="budget"value={{campaign.budget}}>
+        <div class="mb-3">
+            <label class="form-label" for="budget">Budget:</label>
+            <input class="form-control" type="number" name="budget" id="budget" value="{{ campaign.budget }}">
+        </div>
 
-        <label class="form-label" for="visibility">Visibility:</label>
-        <select id="choice" name="visibility">
-            <option value="public" selected>Public</option>
-            <option value="private">private</option>
-        </select>
-        
-        <label class="form-label" for="goals">Goals:</label>
-        <input class="form-control" type="text" name="goals" id="goals" maxlength="50"value={{campaign.goals}}>
-        
+        <div class="mb-3">
+            <label class="form-label" for="visibility">Visibility:</label>
+            <select id="visibility" name="visibility" class="form-control">
+                <option value="public" {% if campaign.visibility == 'public' %}selected{% endif %}>Public</option>
+                <option value="private" {% if campaign.visibility == 'private' %}selected{% endif %}>Private</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="goals">Goals:</label>
+            <input class="form-control" type="text" name="goals" id="goals" maxlength="50" value="{{ campaign.goals }}">
+        </div>
+
         <button type="submit" class="btn btn-success">
-            <i class="fa fa-plus" aria-hidden="true"></i>
-            Create
+            <i class="fa fa-save" aria-hidden="true"></i> Save Changes
         </button>
     </form>
+</div>
 {% endblock %}

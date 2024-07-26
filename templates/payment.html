@@ -1,16 +1,54 @@
 {% extends 'layout.html' %}
 
+{% block title %}Payment{% endblock %}
+
+{% block style %}
+<style>
+    .card-header {
+        background-color: #007bff;
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .card-body {
+        font-size: 1.1rem;
+    }
+    .btn-primary {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .btn-primary:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+</style>
+{% endblock style %}
+
 {% block content %}
 <div class="container">
-    <h2>Payment for Campaign: {{ campaign.name }}</h2>
-    <p><strong>Sponsor:</strong> {{ sponsor.company_name }}</p>
-    <p><strong>Influencer:</strong> {{ influencer.username }}</p>
-    <p><strong>Budget:</strong> ${{ campaign.budget }}</p>
+    <div class="card mt-4">
+        <div class="card-header text-center">
+            Payment for Campaign: {{ campaign.name }}
+        </div>
+        <div class="card-body">
+            <p><strong>Sponsor:</strong> {{ sponsor.company_name }}</p>
+            <p><strong>Influencer:</strong> {{ influencer.username }}</p>
+            <p><strong>Budget:</strong> ${{ campaign.budget }}</p>
 
-    <form action="{{ url_for('complete_payment', campaign_id=campaign.id) }}" method="POST">
-        <button class="btn btn-primary" type="submit">Complete Payment</button>
-    </form>
-    
-    <a href="{{ url_for('generate_bill', campaign_id=campaign.id) }}" class="btn btn-secondary mt-2">Download Bill</a>
+            <form action="{{ url_for('complete_payment', campaign_id=campaign.id) }}" method="POST">
+                <button class="btn btn-primary btn-block mt-3" type="submit">Complete Payment</button>
+            </form>
+            
+            <a href="{{ url_for('generate_bill', campaign_id=campaign.id) }}" class="btn btn-secondary btn-block mt-2">Download Bill</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

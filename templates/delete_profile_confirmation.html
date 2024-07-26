@@ -1,12 +1,51 @@
 {% extends 'layout.html' %}
 
+{% block title %}Confirm Account Deletion{% endblock %}
+
+{% block style %}
+<style>
+    .confirmation-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .confirmation-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #dc3545;
+    }
+    .confirmation-container p {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .confirmation-container .btn-danger {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .confirmation-container .btn-secondary {
+        display: block;
+        width: 100%;
+    }
+</style>
+{% endblock style %}
+
 {% block content %}
 <div class="container">
-    <h2>Confirm Account Deletion</h2>
-    <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-    <form action="{{ url_for('delete_profile') }}" method="POST">
-        <button class="btn btn-danger" type="submit">Delete Account</button>
-        <a href="{{ url_for('update_profile') }}" class="btn btn-secondary">Cancel</a>
-    </form>
+    <div class="confirmation-container">
+        <h2>Confirm Account Deletion</h2>
+        <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+        <form action="{{ url_for('delete_profile') }}" method="POST">
+            <button class="btn btn-danger" type="submit">
+                <i class="fa fa-trash" aria-hidden="true"></i> Delete Account
+            </button>
+            <a href="{{ url_for('update_profile') }}" class="btn btn-secondary">
+                <i class="fa fa-times" aria-hidden="true"></i> Cancel
+            </a>
+        </form>
+    </div>
 </div>
 {% endblock %}
