@@ -39,7 +39,6 @@ class Influencer(db.Model):
     category = db.Column(db.String(100))
     platform = db.Column(db.String(100))
     reach = db.Column(db.Integer)
-    ad_requests = db.relationship('AdRequest', backref='influencer')
     campaigns = db.relationship('Campaign', secondary='campaign_influencer', backref='influencers')
 
 # Campaign model
