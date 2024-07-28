@@ -5,6 +5,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+
 import io
 from datetime import datetime
 # routes
@@ -752,21 +755,40 @@ def generate_bill(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     sponsor = Sponsor.query.get_or_404(campaign.sponsor_id)
     campaignapp = CampaignApplication.query.filter_by(campaign_id=campaign.id).first()
-    influencer=Influencer.query.filter_by(user_id=campaignapp.user_id).first()
+    influencer = Influencer.query.filter_by(user_id=campaignapp.user_id).first()
     
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
     # Create the PDF object, using the buffer as its "file."
     p = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
 
-    # Draw things on the PDF. Here's where you can use the campaign, sponsor, and influencer data.
+    # Add a title
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(1 * inch, 10 * inch, "Campaign Bill")
+
+    # Draw a line below the title
+    p.setLineWidth(1)
+    p.line(1 * inch, 9.8 * inch, 7.5 * inch, 9.8 * inch)
+
+    # Add campaign details
     p.setFont("Helvetica", 12)
-    p.drawString(100, 750, f"Bill for Campaign: {campaign.name}")
-    p.drawString(100, 730, f"Sponsor: {sponsor.company_name}")
-    p.drawString(100, 710, f"Influencer: {influencer.name}")
-    p.drawString(100, 690, f"Budget: ${campaign.budget}")
-    p.drawString(100, 670, f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    p.drawString(1 * inch, 9.5 * inch, f"Campaign: {campaign.name}")
+    p.drawString(1 * inch, 9.2 * inch, f"Sponsor: {sponsor.company_name}")
+    p.drawString(1 * inch, 8.9 * inch, f"Influencer: {influencer.name}")
+    p.drawString(1 * inch, 8.6 * inch, f"Budget: ${campaign.budget}")
+    p.drawString(1 * inch, 8.3 * inch, f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # Draw a line below the details
+    p.setLineWidth(0.5)
+    p.line(1 * inch, 8 * inch, 7.5 * inch, 8 * inch)
+
+    # Add a footer
+    p.setFont("Helvetica-Oblique", 10)
+    p.setFillColor(colors.grey)
+    p.drawString(1 * inch, 0.75 * inch, "Thank you for your business!")
+    p.drawString(1 * inch, 0.5 * inch, "For any queries, contact support@example.com")
 
     # Close the PDF object cleanly.
     p.showPage()
